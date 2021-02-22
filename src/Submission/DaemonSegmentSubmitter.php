@@ -35,8 +35,13 @@ class DaemonSegmentSubmitter implements SegmentSubmitter
 
     public function __construct(string $host = '127.0.0.1', int $port = 2000)
     {
-        $this->host = $host;
-        $this->port = $port;
+        if (isset($_SERVER['AWS_XRAY_DAEMON_ADDRESS'])) {
+            list($host, $port) = explode(":", $_SERVER['AWS_XRAY_DAEMON_ADDRESS']);
+        }
+
+        $this->host = $_SERVER['_AWS_XRAY_DAEMON_ADDRESS'] ?? $host;
+        $this->port = (int) ($_SERVER['_AWS_XRAY_DAEMON_PORT'] ?? $port);
+
         $this->socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
     }
 
