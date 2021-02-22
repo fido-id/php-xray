@@ -80,6 +80,37 @@ class Segment implements JsonSerializable
     }
 
     /**
+     * @param string $traceHeader
+     * @return static
+     */
+    public function setTraceHeader(string $traceHeader = null): Segment
+    {
+        if (is_null($traceHeader)) {
+            return $this;
+        }
+
+        $parts = explode(';', $traceHeader);
+
+        $variables = array_map(function ($str): array {
+            return explode('=', $str);
+        }, $parts);
+
+        $variables = array_column($variables, 1, 0);
+
+        if (isset($variables['Root'])) {
+            $this->setTraceId($variables['Root']);
+        }
+        if (isset($variables['Sampled'])) {
+            $this->setSampled((bool)$variables['Sampled'] ?? false);
+        }
+        if (isset($variables['Parent'])) {
+            $this->setParentId($variables['Parent'] ?? null);
+        }
+
+        return $this;
+    }
+
+    /**
      * @return static
      */
     public function begin(): Segment
