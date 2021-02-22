@@ -18,7 +18,7 @@ class RemoteSegment extends Segment
      * @param bool $traced
      * @return static
      */
-    public function setTraced(bool $traced)
+    public function setTraced(bool $traced): RemoteSegment
     {
         $this->traced = $traced;
 
@@ -28,7 +28,7 @@ class RemoteSegment extends Segment
     /**
      * @inheritdoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $data = parent::jsonSerialize();
 

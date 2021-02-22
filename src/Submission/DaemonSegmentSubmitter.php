@@ -105,7 +105,7 @@ class DaemonSegmentSubmitter implements SegmentSubmitter
     }
 
     /**
-     * @param $rawSegment
+     * @param array $openSegment
      * @return void
      */
     private function submitOpenSegment(array $openSegment)

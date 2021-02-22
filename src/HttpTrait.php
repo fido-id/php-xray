@@ -34,7 +34,7 @@ trait HttpTrait
      * @param string $url
      * @return static
      */
-    public function setUrl(string $url)
+    public function setUrl(string $url): Segment
     {
         $this->url = $url;
 
@@ -45,7 +45,7 @@ trait HttpTrait
      * @param string $method
      * @return static
      */
-    public function setMethod(string $method)
+    public function setMethod(string $method): Segment
     {
         $this->method = $method;
 
@@ -56,7 +56,7 @@ trait HttpTrait
      * @param int $responseCode
      * @return static
      */
-    public function setResponseCode(int $responseCode)
+    public function setResponseCode(int $responseCode): Segment
     {
         $this->responseCode = $responseCode;
 

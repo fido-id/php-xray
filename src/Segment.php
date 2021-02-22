@@ -2,6 +2,7 @@
 
 namespace Pkerrigan\Xray;
 
+use Exception;
 use JsonSerializable;
 use Pkerrigan\Xray\Submission\SegmentSubmitter;
 
@@ -72,13 +73,16 @@ class Segment implements JsonSerializable
 
     public function __construct()
     {
-        $this->id = bin2hex(random_bytes(8));
+        try {
+            $this->id = bin2hex(random_bytes(8));
+        } catch (Exception $e) {
+        }
     }
 
     /**
      * @return static
      */
-    public function begin()
+    public function begin(): Segment
     {
         $this->startTime = microtime(true);
 
@@ -88,7 +92,7 @@ class Segment implements JsonSerializable
     /**
      * @return static
      */
-    public function end()
+    public function end(): Segment
     {
         $this->endTime = microtime(true);
 
@@ -99,7 +103,7 @@ class Segment implements JsonSerializable
      * @param string $name
      * @return static
      */
-    public function setName(string $name)
+    public function setName(string $name): Segment
     {
         $this->name = $name;
 
@@ -110,7 +114,7 @@ class Segment implements JsonSerializable
      * @param bool $error
      * @return static
      */
-    public function setError(bool $error)
+    public function setError(bool $error): Segment
     {
         $this->error = $error;
 
@@ -121,7 +125,7 @@ class Segment implements JsonSerializable
      * @param bool $fault
      * @return static
      */
-    public function setFault(bool $fault)
+    public function setFault(bool $fault): Segment
     {
         $this->fault = $fault;
 
@@ -132,7 +136,7 @@ class Segment implements JsonSerializable
      * @param Segment $subsegment
      * @return static
      */
-    public function addSubsegment(Segment $subsegment)
+    public function addSubsegment(Segment $subsegment): Segment
     {
         if (!$this->isOpen()) {
             return $this;
@@ -168,7 +172,7 @@ class Segment implements JsonSerializable
      * @param bool $sampled
      * @return static
      */
-    public function setSampled(bool $sampled)
+    public function setSampled(bool $sampled): Segment
     {
         $this->sampled = $sampled;
 
@@ -184,10 +188,10 @@ class Segment implements JsonSerializable
     }
 
     /**
-     * @param string $parentId
+     * @param string|null $parentId
      * @return static
      */
-    public function setParentId(string $parentId = null)
+    public function setParentId(string $parentId = null): Segment
     {
         $this->parentId = $parentId;
 
@@ -198,7 +202,7 @@ class Segment implements JsonSerializable
      * @param string $traceId
      * @return static
      */
-    public function setTraceId(string $traceId)
+    public function setTraceId(string $traceId): Segment
     {
         $this->traceId = $traceId;
 
@@ -225,7 +229,7 @@ class Segment implements JsonSerializable
      * @param bool $independent
      * @return static
      */
-    public function setIndependent(bool $independent)
+    public function setIndependent(bool $independent): Segment
     {
         $this->independent = $independent;
 
@@ -237,7 +241,7 @@ class Segment implements JsonSerializable
      * @param string $value
      * @return static
      */
-    public function addAnnotation(string $key, string $value)
+    public function addAnnotation(string $key, string $value): Segment
     {
         $this->annotations[$key] = $value;
 
@@ -249,7 +253,7 @@ class Segment implements JsonSerializable
      * @param $value
      * @return static
      */
-    public function addMetadata(string $key, $value)
+    public function addMetadata(string $key, $value): Segment
     {
         $this->metadata[$key] = $value;
 
@@ -273,7 +277,7 @@ class Segment implements JsonSerializable
     /**
      * @inheritdoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return array_filter([
             'id' => $this->id,

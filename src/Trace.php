@@ -2,6 +2,8 @@
 
 namespace Pkerrigan\Xray;
 
+use Exception;
+
 /**
  *
  * @author Patrick Kerrigan (patrickkerrigan.uk)
@@ -27,7 +29,7 @@ class Trace extends Segment
     /**
      * @return static
      */
-    public static function getInstance()
+    public static function getInstance(): Trace
     {
         if (is_null(self::$instance)) {
             self::$instance = new static();
@@ -40,7 +42,7 @@ class Trace extends Segment
      * @param string $traceHeader
      * @return static
      */
-    public function setTraceHeader(string $traceHeader = null)
+    public function setTraceHeader(string $traceHeader = null): Trace
     {
         if (is_null($traceHeader)) {
             return $this;
@@ -71,7 +73,7 @@ class Trace extends Segment
      * @param string $serviceVersion
      * @return static
      */
-    public function setServiceVersion(string $serviceVersion)
+    public function setServiceVersion(string $serviceVersion): Trace
     {
         $this->serviceVersion = $serviceVersion;
 
@@ -82,7 +84,7 @@ class Trace extends Segment
      * @param string $user
      * @return static
      */
-    public function setUser(string $user)
+    public function setUser(string $user): Trace
     {
         $this->user = $user;
 
@@ -93,7 +95,7 @@ class Trace extends Segment
      * @param string $clientIpAddress
      * @return static
      */
-    public function setClientIpAddress(string $clientIpAddress)
+    public function setClientIpAddress(string $clientIpAddress): Trace
     {
         $this->clientIpAddress = $clientIpAddress;
 
@@ -104,7 +106,7 @@ class Trace extends Segment
      * @param string $userAgent
      * @return static
      */
-    public function setUserAgent(string $userAgent)
+    public function setUserAgent(string $userAgent): Trace
     {
         $this->userAgent = $userAgent;
 
@@ -113,8 +115,9 @@ class Trace extends Segment
 
     /**
      * @inheritdoc
+     * @throws Exception
      */
-    public function begin(int $samplePercentage = 10)
+    public function begin(int $samplePercentage = 10): Segment
     {
         parent::begin();
 
@@ -132,7 +135,7 @@ class Trace extends Segment
     /**
      * @inheritdoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $data = parent::jsonSerialize();
 
@@ -146,8 +149,10 @@ class Trace extends Segment
     private function generateTraceId()
     {
         $startHex = dechex((int)$this->startTime);
-        $uuid = bin2hex(random_bytes(12));
-
-        $this->setTraceId("1-{$startHex}-{$uuid}");
+        try {
+            $uuid = bin2hex(random_bytes(12));
+            $this->setTraceId("1-{$startHex}-{$uuid}");
+        } catch (Exception $e) {
+        }
     }
 }
