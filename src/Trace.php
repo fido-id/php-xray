@@ -57,8 +57,12 @@ class Trace extends Segment
         if (isset($variables['Root'])) {
             $this->setTraceId($variables['Root']);
         }
-        $this->setSampled($variables['Sampled'] ?? false);
-        $this->setParentId($variables['Parent'] ?? null);
+        if (isset($variables['Sampled'])) {
+            $this->setSampled((bool)$variables['Sampled'] ?? false);
+        }
+        if (isset($variables['Parent'])) {
+            $this->setParentId($variables['Parent'] ?? null);
+        }
 
         return $this;
     }
