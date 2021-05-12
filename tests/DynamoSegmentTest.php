@@ -17,13 +17,13 @@ class DynamoSegmentTest extends TestCase
         $segment->setTableName('example-table')
             ->setOperation('UpdateItem')
             ->setRequestId('3AIENM5J4ELQ3SPODHKBIRVIC3VV4KQNSO5AEMVJF66Q9ASUAAJG')
-            ->addResourceName('resource', 'value');
+            ->addResourceName('value');
 
         $serialised = $segment->jsonSerialize();
 
         $this->assertEquals('example-table', $serialised['aws']['table_name']);
         $this->assertEquals('UpdateItem', $serialised['aws']['operation']);
         $this->assertEquals('3AIENM5J4ELQ3SPODHKBIRVIC3VV4KQNSO5AEMVJF66Q9ASUAAJG', $serialised['aws']['request_id']);
-        $this->assertEquals('value', $serialised['aws']['resource_names']['resource']);
+        $this->assertContains('value', $serialised['aws']['resource_names']);
     }
 }

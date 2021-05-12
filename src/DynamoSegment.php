@@ -64,13 +64,12 @@ class DynamoSegment extends RemoteSegment
     }
 
     /**
-     * @param string $key
-     * @param $value
+     * @param string $value
      * @return static
      */
-    public function addResourceName(string $key, $value): DynamoSegment
+    public function addResourceName(string $value): DynamoSegment
     {
-        $this->resourceNames[$key] = $value;
+        $this->resourceNames[] = $value;
 
         return $this;
     }
