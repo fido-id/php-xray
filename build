@@ -1,5 +1,14 @@
 #!/bin/sh
 
+echo "Install git hooks..."
+touch .git/hooks/pre-commit
+echo "#!/bin/sh
+
+./run composer run test" > .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+echo " done!\n"
+
+echo "Build image..."
 image_name="php-xray"
 dockerfile="Dockerfile.xray"
 
@@ -9,3 +18,4 @@ docker build \
   --build-arg UID="$(id -u)" \
   "."
 
+echo " done!\n"
