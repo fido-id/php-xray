@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class SqlSegmentTest extends TestCase
 {
-    public function testSerialisesCorrectly()
+    public function testSerialisesCorrectly(): void
     {
         $segment = new SqlSegment();
         $segment->setQuery('SELECT *')
@@ -15,7 +15,8 @@ class SqlSegmentTest extends TestCase
             ->setDriverVersion('10')
             ->setPreparation('prepared')
             ->setUser('test')
-            ->setUrl('pgsql://test@localhost');
+            ->setUrl('pgsql://test@localhost')
+        ;
 
         $serialised = $segment->jsonSerialize();
 

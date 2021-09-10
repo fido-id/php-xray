@@ -6,13 +6,14 @@ use PHPUnit\Framework\TestCase;
 
 class DynamoSegmentTest extends TestCase
 {
-    public function testSerialisesCorrectly()
+    public function testSerialisesCorrectly(): void
     {
         $segment = new DynamoSegment();
         $segment->setTableName('example-table')
             ->setOperation('UpdateItem')
             ->setRequestId('3AIENM5J4ELQ3SPODHKBIRVIC3VV4KQNSO5AEMVJF66Q9ASUAAJG')
-            ->addResourceName('value');
+            ->addResourceName('value')
+        ;
 
         $serialised = $segment->jsonSerialize();
 

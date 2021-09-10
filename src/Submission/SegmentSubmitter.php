@@ -6,5 +6,5 @@ use Fido\PHPXray\Segment;
 
 interface SegmentSubmitter
 {
-    public function submitSegment(Segment $segment);
+    public function submitSegment(Segment $segment): void;
 }

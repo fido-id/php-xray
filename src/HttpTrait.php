@@ -4,54 +4,27 @@ namespace Fido\PHPXray;
 
 trait HttpTrait
 {
-    /**
-     * @var string
-     */
-    protected $url;
-    /**
-     * @var string
-     */
-    protected $method;
-    /**
-     * @var string
-     */
-    protected $clientIpAddress;
-    /**
-     * @var string
-     */
-    protected $userAgent;
-    /**
-     * @var int
-     */
-    protected $responseCode;
+    protected string $url;
+    protected string $method;
+    protected string $clientIpAddress;
+    protected string $userAgent;
+    protected int    $responseCode;
 
-    /**
-     * @param string $url
-     * @return static
-     */
-    public function setUrl(string $url): Segment
+    public function setUrl(string $url): self
     {
         $this->url = $url;
 
         return $this;
     }
 
-    /**
-     * @param string $method
-     * @return static
-     */
-    public function setMethod(string $method): Segment
+    public function setMethod(string $method): self
     {
         $this->method = $method;
 
         return $this;
     }
 
-    /**
-     * @param int $responseCode
-     * @return static
-     */
-    public function setResponseCode(int $responseCode): Segment
+    public function setResponseCode(int $responseCode): self
     {
         $this->responseCode = $responseCode;
 
@@ -59,20 +32,20 @@ trait HttpTrait
     }
 
     /**
-     * @return array
+     * @return array{request: array<string, mixed>, response: array<string, mixed>}
      */
     protected function serialiseHttpData(): array
     {
         return [
-            'request' => array_filter([
-                'url' => $this->url,
-                'method' => $this->method,
-                'client_ip' => $this->clientIpAddress,
-                'user_agent' => $this->userAgent
+            'request'  => array_filter([
+                'url'        => $this->url ?? null,
+                'method'     => $this->method ?? null,
+                'client_ip'  => $this->clientIpAddress ?? null,
+                'user_agent' => $this->userAgent ?? null,
             ]),
             'response' => array_filter([
-                'status' => $this->responseCode
-            ])
+                'status' => $this->responseCode ?? null,
+            ]),
         ];
     }
 }

@@ -2,73 +2,47 @@
 
 namespace Fido\PHPXray;
 
+use Exception;
+
 class Trace extends Segment
 {
     use HttpTrait;
 
-    /**
-     * @var static
-     */
-    private static $instance;
-    /**
-     * @var string
-     */
-    private $serviceVersion;
-    /**
-     * @var string
-     */
-    private $user;
+    private static self $instance;
+    private string $serviceVersion;
+    private string $user;
 
-    /**
-     * @return static
-     */
-    public static function getInstance(): Trace
+    public static function getInstance(): self
     {
-        if (is_null(self::$instance)) {
-            self::$instance = new static();
+        if (!isset(self::$instance)) {
+            self::$instance = new self();
         }
 
         return self::$instance;
     }
 
-    /**
-     * @param string $serviceVersion
-     * @return static
-     */
-    public function setServiceVersion(string $serviceVersion): Trace
+    public function setServiceVersion(string $serviceVersion): self
     {
         $this->serviceVersion = $serviceVersion;
 
         return $this;
     }
 
-    /**
-     * @param string $user
-     * @return static
-     */
-    public function setUser(string $user): Trace
+    public function setUser(string $user): self
     {
         $this->user = $user;
 
         return $this;
     }
 
-    /**
-     * @param string $clientIpAddress
-     * @return static
-     */
-    public function setClientIpAddress(string $clientIpAddress): Trace
+    public function setClientIpAddress(string $clientIpAddress): self
     {
         $this->clientIpAddress = $clientIpAddress;
 
         return $this;
     }
 
-    /**
-     * @param string $userAgent
-     * @return static
-     */
-    public function setUserAgent(string $userAgent): Trace
+    public function setUserAgent(string $userAgent): self
     {
         $this->userAgent = $userAgent;
 
@@ -76,13 +50,13 @@ class Trace extends Segment
     }
 
     /**
-     * @inheritdoc
+     * @throws Exception
      */
     public function begin(int $samplePercentage = 10): Segment
     {
         parent::begin();
 
-        if (is_null($this->traceId)) {
+        if (!isset($this->traceId)) {
             $this->generateTraceId();
         }
 
@@ -100,20 +74,20 @@ class Trace extends Segment
     {
         $data = parent::jsonSerialize();
 
-        $data['http'] = $this->serialiseHttpData();
+        $data['http']    = $this->serialiseHttpData();
         $data['service'] = empty($this->serviceVersion) ? null : ['version' => $this->serviceVersion];
-        $data['user'] = $this->user;
+        $data['user']    = $this->user ?? null;
 
         return array_filter($data);
     }
 
-    private function generateTraceId()
+    /**
+     * @throws Exception if an appropriate source of randomness cannot be found.
+     */
+    private function generateTraceId(): void
     {
         $startHex = dechex((int)$this->startTime);
-        try {
-            $uuid = bin2hex(random_bytes(12));
-            $this->setTraceId("1-{$startHex}-{$uuid}");
-        } catch (Exception $e) {
-        }
+        $uuid     = bin2hex(random_bytes(12));
+        $this->setTraceId("1-$startHex-$uuid");
     }
 }

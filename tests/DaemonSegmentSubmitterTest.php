@@ -4,12 +4,11 @@ namespace Fido\PHPXray;
 
 use PHPUnit\Framework\TestCase;
 use Fido\PHPXray\Submission\DaemonSegmentSubmitter;
+use Socket;
 
 class DaemonSegmentSubmitterTest extends TestCase
 {
-    /**
-     * @var resource
-     */
+    /** @var Socket */
     private $socket;
 
     protected function setUp(): void
@@ -25,21 +24,22 @@ class DaemonSegmentSubmitterTest extends TestCase
         parent::tearDown();
     }
 
-    public function testSubmitsToDaemon()
+    public function testSubmitsToDaemon(): void
     {
         $segment = new Segment();
         $segment->setSampled(true)
             ->setName('Test segment')
             ->begin()
             ->end()
-            ->submit(new DaemonSegmentSubmitter());
+            ->submit(new DaemonSegmentSubmitter())
+        ;
 
         $packets = $this->receivePackets(1);
 
         $this->assertPacketsReceived([$segment], $packets);
     }
 
-    public function testSubmitsLongTraceAsFragmented()
+    public function testSubmitsLongTraceAsFragmented(): void
     {
         $subsegment1 = (new SqlSegment())
             ->setQuery(str_repeat('a', 30000));
@@ -56,7 +56,8 @@ class DaemonSegmentSubmitterTest extends TestCase
             ->addSubsegment($subsegment2)
             ->addSubsegment($subsegment3)
             ->end()
-            ->submit(new DaemonSegmentSubmitter());
+            ->submit(new DaemonSegmentSubmitter())
+        ;
 
         $buffer = $this->receivePackets(5);
 
@@ -68,15 +69,18 @@ class DaemonSegmentSubmitterTest extends TestCase
 
         $subsegment1->setIndependent(true)
             ->setTraceId($segment->getTraceId())
-            ->setParentId($segment->getId());
+            ->setParentId($segment->getId())
+        ;
 
         $subsegment2->setIndependent(true)
             ->setTraceId($segment->getTraceId())
-            ->setParentId($segment->getId());
+            ->setParentId($segment->getId())
+        ;
 
         $subsegment3->setIndependent(true)
             ->setTraceId($segment->getTraceId())
-            ->setParentId($segment->getId());
+            ->setParentId($segment->getId())
+        ;
 
         $expectedPackets = [$openingSegment, $subsegment1, $subsegment2, $subsegment3, $rawSegment];
 
@@ -84,10 +88,10 @@ class DaemonSegmentSubmitterTest extends TestCase
     }
 
     /**
-     * @param $expectedPackets
-     * @param $buffer
+     * @param Segment[]|array<string, Segment[]> $expectedPackets
+     * @param string[] $buffer
      */
-    private function assertPacketsReceived($expectedPackets, $buffer)
+    private function assertPacketsReceived(array $expectedPackets, array $buffer): void
     {
         for ($i = 0; $i < count($expectedPackets); $i++) {
             $this->assertEquals(
@@ -98,13 +102,12 @@ class DaemonSegmentSubmitterTest extends TestCase
     }
 
     /**
-     * @param int $number
-     * @return array
+     * @return  array<int, string>
      */
     private function receivePackets(int $number): array
     {
-        $from = '';
-        $port = 0;
+        $from   = '';
+        $port   = 0;
         $buffer = array_fill(0, $number, '');
 
         for ($i = 0; $i < $number; $i++) {

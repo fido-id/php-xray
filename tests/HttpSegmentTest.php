@@ -6,12 +6,14 @@ use PHPUnit\Framework\TestCase;
 
 class HttpSegmentTest extends TestCase
 {
-    public function testSerialisesCorrectly()
+    public function testSerialisesCorrectly(): void
     {
         $segment = new HttpSegment();
-        $segment->setUrl('http://example.com/')
+        $segment
+            ->setUrl('http://example.com/')
             ->setMethod('GET')
-            ->setResponseCode(200);
+            ->setResponseCode(200)
+        ;
 
         $serialised = $segment->jsonSerialize();
 
