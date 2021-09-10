@@ -5,69 +5,39 @@ namespace Pkerrigan\Xray;
 /**
  *
  * @author Patrick Kerrigan (patrickkerrigan.uk)
- * @since 14/05/2018
+ * @since  14/05/2018
  */
 class DynamoSegment extends RemoteSegment
 {
 
-    /**
-     * @var string|null
-     */
-    protected $tableName;
-    
-    /**
-     * @var string|null
-     */
-    protected $operation;
+    protected string $tableName;
+    protected string $operation;
+    protected string $requestId;
+    /** @var string[] */
+    protected array $resourceNames;
 
-    /**
-     * @var string|null
-     */
-    protected $requestId;
-
-    /**
-     * @var array|null
-     */
-    protected $resourceNames;
-
-    /**
-     * @param string $tableName
-     * @return static
-     */
-    public function setTableName(string $tableName): DynamoSegment
+    public function setTableName(string $tableName): self
     {
         $this->tableName = $tableName;
 
         return $this;
     }
 
-    /**
-     * @param string $operation
-     * @return static
-     */
-    public function setOperation(string $operation): DynamoSegment
+    public function setOperation(string $operation): self
     {
         $this->operation = $operation;
 
         return $this;
     }
 
-    /**
-     * @param string $requestId
-     * @return static
-     */
-    public function setRequestId(string $requestId): DynamoSegment
+    public function setRequestId(string $requestId): self
     {
         $this->requestId = $requestId;
 
         return $this;
     }
 
-    /**
-     * @param string $value
-     * @return static
-     */
-    public function addResourceName(string $value): DynamoSegment
+    public function addResourceName(string $value): self
     {
         $this->resourceNames[] = $value;
 
@@ -82,10 +52,10 @@ class DynamoSegment extends RemoteSegment
         $data = parent::jsonSerialize();
 
         $data['aws'] = array_filter([
-            'table_name' => $this->tableName,
-            'operation' => $this->operation,
-            'request_id' => $this->requestId,
-            'resource_names' => $this->resourceNames
+            'table_name'     => $this->tableName ?? null,
+            'operation'      => $this->operation ?? null,
+            'request_id'     => $this->requestId ?? null,
+            'resource_names' => $this->resourceNames ?? null ?: null,
         ]);
 
         return $data;

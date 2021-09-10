@@ -7,17 +7,18 @@ use PHPUnit\Framework\TestCase;
 /**
  *
  * @author Patrick Kerrigan (patrickkerrigan.uk)
- * @since 17/05/2018
+ * @since  17/05/2018
  */
 class DynamoSegmentTest extends TestCase
 {
-    public function testSerialisesCorrectly()
+    public function testSerialisesCorrectly(): void
     {
         $segment = new DynamoSegment();
         $segment->setTableName('example-table')
-            ->setOperation('UpdateItem')
-            ->setRequestId('3AIENM5J4ELQ3SPODHKBIRVIC3VV4KQNSO5AEMVJF66Q9ASUAAJG')
-            ->addResourceName('value');
+                ->setOperation('UpdateItem')
+                ->setRequestId('3AIENM5J4ELQ3SPODHKBIRVIC3VV4KQNSO5AEMVJF66Q9ASUAAJG')
+                ->addResourceName('value')
+        ;
 
         $serialised = $segment->jsonSerialize();
 

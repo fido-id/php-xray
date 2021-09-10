@@ -7,20 +7,21 @@ use PHPUnit\Framework\TestCase;
 /**
  *
  * @author Patrick Kerrigan (patrickkerrigan.uk)
- * @since 17/05/2018
+ * @since  17/05/2018
  */
 class SqlSegmentTest extends TestCase
 {
-    public function testSerialisesCorrectly()
+    public function testSerialisesCorrectly(): void
     {
         $segment = new SqlSegment();
         $segment->setQuery('SELECT *')
-            ->setDatabaseType('PostgreSQL')
-            ->setDatabaseVersion('10.4')
-            ->setDriverVersion('10')
-            ->setPreparation('prepared')
-            ->setUser('test')
-            ->setUrl('pgsql://test@localhost');
+                ->setDatabaseType('PostgreSQL')
+                ->setDatabaseVersion('10.4')
+                ->setDriverVersion('10')
+                ->setPreparation('prepared')
+                ->setUser('test')
+                ->setUrl('pgsql://test@localhost')
+        ;
 
         $serialised = $segment->jsonSerialize();
 

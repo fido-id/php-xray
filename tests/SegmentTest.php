@@ -9,18 +9,19 @@ use Pkerrigan\Xray\Submission\SegmentSubmitter;
 /**
  *
  * @author Patrick Kerrigan (patrickkerrigan.uk)
- * @since 17/05/2018
+ * @since  17/05/2018
  */
 class SegmentTest extends TestCase
 {
-    public function testSegmentWithoutErrorsSerialisesCorrectly()
+    public function testSegmentWithoutErrorsSerialisesCorrectly(): void
     {
         $segment = new Segment();
 
         $segment->setName('Test segment')
-            ->setParentId('123')
-            ->begin()
-            ->end();
+                ->setParentId('123')
+                ->begin()
+                ->end()
+        ;
 
         $serialised = $segment->jsonSerialize();
 
@@ -33,15 +34,16 @@ class SegmentTest extends TestCase
         $this->assertArrayNotHasKey('subsegments', $serialised);
     }
 
-    public function testSegmentWithErrorSerialisesCorrectly()
+    public function testSegmentWithErrorSerialisesCorrectly(): void
     {
         $segment = new Segment();
 
         $segment->setName('Test segment')
-            ->setParentId('123')
-            ->begin()
-            ->end()
-            ->setError(true);
+                ->setParentId('123')
+                ->begin()
+                ->end()
+                ->setError(true)
+        ;
 
         $serialised = $segment->jsonSerialize();
 
@@ -54,15 +56,16 @@ class SegmentTest extends TestCase
         $this->assertArrayNotHasKey('subsegments', $serialised);
     }
 
-    public function testSegmentWithFaultSerialisesCorrectly()
+    public function testSegmentWithFaultSerialisesCorrectly(): void
     {
         $segment = new Segment();
 
         $segment->setName('Test segment')
-            ->setParentId('123')
-            ->begin()
-            ->end()
-            ->setFault(true);
+                ->setParentId('123')
+                ->begin()
+                ->end()
+                ->setFault(true)
+        ;
 
         $serialised = $segment->jsonSerialize();
 
@@ -75,20 +78,22 @@ class SegmentTest extends TestCase
         $this->assertArrayNotHasKey('subsegments', $serialised);
     }
 
-    public function testSegmentWithSubsegmentSerialisesCorrectly()
+    public function testSegmentWithSubsegmentSerialisesCorrectly(): void
     {
-        $segment = new Segment();
+        $segment    = new Segment();
         $subsegment = new Segment();
 
         $subsegment->setName('Test subsegment')
-            ->begin()
-            ->end();
+                   ->begin()
+                   ->end()
+        ;
 
         $segment->setName('Test segment')
-            ->setParentId('123')
-            ->begin()
-            ->addSubsegment($subsegment)
-            ->end();
+                ->setParentId('123')
+                ->begin()
+                ->addSubsegment($subsegment)
+                ->end()
+        ;
 
         $serialised = $segment->jsonSerialize();
 
@@ -101,7 +106,7 @@ class SegmentTest extends TestCase
         $this->assertEquals($subsegment, $serialised['subsegments'][0]);
     }
 
-    public function testIndependentSubsegmentSerialisesCorrectly()
+    public function testIndependentSubsegmentSerialisesCorrectly(): void
     {
         $segment = new Segment();
 
@@ -110,7 +115,8 @@ class SegmentTest extends TestCase
                 ->setTraceId('456')
                 ->setIndependent(true)
                 ->begin()
-                ->end();
+                ->end()
+        ;
 
         $serialised = $segment->jsonSerialize();
 
@@ -119,89 +125,96 @@ class SegmentTest extends TestCase
         $this->assertEquals('subsegment', $serialised['type']);
     }
 
-    public function testGivenAnnotationsSerialisesCorrectly()
+    public function testGivenAnnotationsSerialisesCorrectly(): void
     {
         $segment = new Segment();
         $segment->addAnnotation('key1', 'value1')
-            ->addAnnotation('key2', 'value2');
+                ->addAnnotation('key2', 'value2')
+        ;
 
         $serialised = $segment->jsonSerialize();
 
         $this->assertEquals(
             [
                 'key1' => 'value1',
-                'key2' => 'value2'
+                'key2' => 'value2',
             ],
             $serialised['annotations']
         );
     }
 
-    public function testGivenMetadataSerialisesCorrectly()
+    public function testGivenMetadataSerialisesCorrectly(): void
     {
         $segment = new Segment();
         $segment->addMetadata('key1', 'value1')
-            ->addMetadata('key2', ['value2', 'value3']);
+                ->addMetadata('key2', ['value2', 'value3'])
+        ;
 
         $serialised = $segment->jsonSerialize();
 
         $this->assertEquals(
             [
                 'key1' => 'value1',
-                'key2' => ['value2', 'value3']
+                'key2' => ['value2', 'value3'],
             ],
             $serialised['metadata']
         );
     }
 
-    public function testAddingSubsegmentToClosedSegmentFails()
+    public function testAddingSubsegmentToClosedSegmentFails(): void
     {
-        $segment = new Segment();
+        $segment    = new Segment();
         $subsegment = new Segment();
 
         $subsegment->setName('Test subsegment')
-            ->begin()
-            ->end();
+                   ->begin()
+                   ->end()
+        ;
 
         $segment->setName('Test segment')
-            ->setParentId('123')
-            ->begin()
-            ->end()
-            ->addSubsegment($subsegment);
+                ->setParentId('123')
+                ->begin()
+                ->end()
+                ->addSubsegment($subsegment)
+        ;
 
         $serialised = $segment->jsonSerialize();
 
         $this->assertArrayNotHasKey('subsegments', $serialised);
     }
 
-    public function testAddingSubsegmentSetsSampled()
+    public function testAddingSubsegmentSetsSampled(): void
     {
-        $segment = new Segment();
+        $segment    = new Segment();
         $subsegment = new Segment();
 
         $subsegment->setName('Test subsegment')
-            ->begin()
-            ->end();
+                   ->begin()
+                   ->end()
+        ;
 
         $segment->setName('Test segment')
-            ->setParentId('123')
-            ->setSampled(true)
-            ->begin()
-            ->addSubsegment($subsegment)
-            ->end();
+                ->setParentId('123')
+                ->setSampled(true)
+                ->begin()
+                ->addSubsegment($subsegment)
+                ->end()
+        ;
 
         $this->assertTrue($subsegment->isSampled());
     }
 
-    public function testIsNotOpenIfEndTimeSet()
+    public function testIsNotOpenIfEndTimeSet(): void
     {
         $segment = new Segment();
         $segment->begin()
-            ->end();
+                ->end()
+        ;
 
         $this->assertFalse($segment->isOpen());
     }
 
-    public function testIsOpenIfEndTimeNotSet()
+    public function testIsOpenIfEndTimeNotSet(): void
     {
         $segment = new Segment();
         $segment->begin();
@@ -209,7 +222,7 @@ class SegmentTest extends TestCase
         $this->assertTrue($segment->isOpen());
     }
 
-    public function testSubmitsIfSampled()
+    public function testSubmitsIfSampled(): void
     {
         /** @var SegmentSubmitter|MockObject $submitter */
         $submitter = $this->createMock(SegmentSubmitter::class);
@@ -217,15 +230,16 @@ class SegmentTest extends TestCase
         $segment = new Segment();
 
         $submitter->expects($this->once())
-            ->method('submitSegment')
-            ->with($segment);
+                  ->method('submitSegment')
+                  ->with($segment)
+        ;
 
         $segment->setSampled(true)
-            ->submit($submitter);
-
+                ->submit($submitter)
+        ;
     }
 
-    public function testDoesNotSubmitIfNotSampled()
+    public function testDoesNotSubmitIfNotSampled(): void
     {
         /** @var SegmentSubmitter|MockObject $submitter */
         $submitter = $this->createMock(SegmentSubmitter::class);
@@ -233,14 +247,15 @@ class SegmentTest extends TestCase
         $segment = new Segment();
 
         $submitter->expects($this->never())
-            ->method('submitSegment');
+                  ->method('submitSegment')
+        ;
 
         $segment->setSampled(false)
-            ->submit($submitter);
-
+                ->submit($submitter)
+        ;
     }
 
-    public function testGivenNoSubsegmentsCurrentSegmentReturnsSegment()
+    public function testGivenNoSubsegmentsCurrentSegmentReturnsSegment(): void
     {
         $segment = new Segment();
         $segment->begin();
@@ -248,42 +263,46 @@ class SegmentTest extends TestCase
         $this->assertEquals($segment, $segment->getCurrentSegment());
     }
 
-    public function testClosedSubsegmentCurrentSegmentReturnsSegment()
+    public function testClosedSubsegmentCurrentSegmentReturnsSegment(): void
     {
         $subsegment = new Segment();
         $subsegment->begin()
-            ->end();
+                   ->end()
+        ;
         $segment = new Segment();
         $segment->begin()
-            ->addSubsegment($subsegment);
+                ->addSubsegment($subsegment)
+        ;
 
         $this->assertEquals($segment, $segment->getCurrentSegment());
     }
 
-    public function testOpenSubsegmentCurrentSegmentReturnsSubsegment()
+    public function testOpenSubsegmentCurrentSegmentReturnsSubsegment(): void
     {
         $subsegment = new Segment();
         $subsegment->begin();
         $segment = new Segment();
         $segment->begin()
-            ->addSubsegment($subsegment);
+                ->addSubsegment($subsegment)
+        ;
 
         $this->assertEquals($subsegment, $segment->getCurrentSegment());
     }
 
-    public function testSubsequentCallsCurrentSegmentReturnsSubsegment()
+    public function testSubsequentCallsCurrentSegmentReturnsSubsegment(): void
     {
         $subsegment = new Segment();
         $subsegment->begin();
         $segment = new Segment();
         $segment->begin()
-                ->addSubsegment($subsegment);
+                ->addSubsegment($subsegment)
+        ;
 
         $this->assertEquals($subsegment, $segment->getCurrentSegment());
         $this->assertEquals($subsegment, $segment->getCurrentSegment());
     }
 
-    public function testChangingCurrentSegmentReturnsCorrectStatus()
+    public function testChangingCurrentSegmentReturnsCorrectStatus(): void
     {
         $subsegment1 = new Segment();
         $subsegment1->begin();
@@ -296,7 +315,8 @@ class SegmentTest extends TestCase
         $segment->begin()
                 ->addSubsegment($subsegment1)
                 ->addSubsegment($subsegment2)
-                ->addSubsegment($subsegment3);
+                ->addSubsegment($subsegment3)
+        ;
 
         $this->assertEquals($subsegment1, $segment->getCurrentSegment());
 

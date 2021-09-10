@@ -5,20 +5,13 @@ namespace Pkerrigan\Xray;
 /**
  *
  * @author Patrick Kerrigan (patrickkerrigan.uk)
- * @since 14/05/2018
+ * @since  14/05/2018
  */
 class RemoteSegment extends Segment
 {
-    /**
-     * @var bool
-     */
-    protected $traced = false;
+    protected bool $traced = false;
 
-    /**
-     * @param bool $traced
-     * @return static
-     */
-    public function setTraced(bool $traced): RemoteSegment
+    public function setTraced(bool $traced): self
     {
         $this->traced = $traced;
 
@@ -33,7 +26,7 @@ class RemoteSegment extends Segment
         $data = parent::jsonSerialize();
 
         $data['namespace'] = 'remote';
-        $data['traced'] = $this->traced;
+        $data['traced']    = $this->traced;
 
         return array_filter($data);
     }

@@ -2,88 +2,43 @@
 
 namespace Pkerrigan\Xray;
 
-use Exception;
 use JsonSerializable;
 use Pkerrigan\Xray\Submission\SegmentSubmitter;
 
 /**
  *
  * @author Patrick Kerrigan (patrickkerrigan.uk)
- * @since 13/05/2018
+ * @since  13/05/2018
  */
 class Segment implements JsonSerializable
 {
-    /**
-     * @var string
-     * @SuppressWarnings(PHPMD.ShortVariable)
-     */
-    protected $id;
-    /**
-     * @var string
-     */
-    protected $parentId;
-    /**
-     * @var string
-     */
-    protected $traceId;
-    /**
-     * @var string|null
-     */
-    protected $name;
-    /**
-     * @var float
-     */
-    protected $startTime;
-    /**
-     * @var float
-     */
-    protected $endTime;
-    /**
-     * @var Segment[]
-     */
-    protected $subsegments = [];
-    /**
-     * @var bool
-     */
-    protected $error = false;
-    /**
-     * @var bool
-     */
-    protected $fault = false;
-    /**
-     * @var bool
-     */
-    protected $sampled = false;
-    /**
-     * @var bool
-     */
-    protected $independent = false;
-    /**
-     * @var string[]
-     */
-    private $annotations;
-    /**
-     * @var string[]
-     */
-    private $metadata;
-    /**
-     * @var int
-     */
-    private $lastOpenSegment = 0;
+    protected string  $id;
+    protected ?string $parentId = null;
+    protected string  $traceId;
+    protected ?string $name     = null;
+    protected float   $startTime;
+    protected float   $endTime;
+    /** @var Segment[] */
+    protected array $subsegments = [];
+    protected bool  $error       = false;
+    protected bool  $fault       = false;
+    protected bool  $sampled     = false;
+    protected bool  $independent = false;
+    /** @var array<string, mixed> */
+    private array $annotations;
+    /** @var array<string, mixed> */
+    private array $metadata;
+    private int   $lastOpenSegment = 0;
 
+    /**
+     * @throws \Exception if an appropriate source of randomness cannot be found.
+     */
     public function __construct()
     {
-        try {
-            $this->id = bin2hex(random_bytes(8));
-        } catch (Exception $e) {
-        }
+        $this->id = bin2hex(random_bytes(8));
     }
 
-    /**
-     * @param string $traceHeader
-     * @return static
-     */
-    public function setTraceHeader(string $traceHeader = null): Segment
+    public function setTraceHeader(string $traceHeader = null): self
     {
         if (is_null($traceHeader)) {
             return $this;
@@ -110,64 +65,42 @@ class Segment implements JsonSerializable
         return $this;
     }
 
-    /**
-     * @return static
-     */
-    public function begin(): Segment
+    public function begin(): self
     {
         $this->startTime = microtime(true);
 
         return $this;
     }
 
-    /**
-     * @return static
-     */
-    public function end(): Segment
+    public function end(): self
     {
         $this->endTime = microtime(true);
 
         return $this;
     }
 
-    /**
-     * @param string $name
-     * @return static
-     */
-    public function setName(string $name): Segment
+    public function setName(string $name): self
     {
         $this->name = $name;
 
         return $this;
     }
 
-    /**
-     * @param bool $error
-     * @return static
-     */
-    public function setError(bool $error): Segment
+    public function setError(bool $error): self
     {
         $this->error = $error;
 
         return $this;
     }
 
-    /**
-     * @param bool $fault
-     * @return static
-     */
-    public function setFault(bool $fault): Segment
+    public function setFault(bool $fault): self
     {
         $this->fault = $fault;
 
         return $this;
     }
 
-    /**
-     * @param Segment $subsegment
-     * @return static
-     */
-    public function addSubsegment(Segment $subsegment): Segment
+    public function addSubsegment(Segment $subsegment): self
     {
         if (!$this->isOpen()) {
             return $this;
@@ -179,10 +112,7 @@ class Segment implements JsonSerializable
         return $this;
     }
 
-    /**
-     * @param SegmentSubmitter $submitter
-     */
-    public function submit(SegmentSubmitter $submitter)
+    public function submit(SegmentSubmitter $submitter): void
     {
         if (!$this->isSampled()) {
             return;
@@ -191,49 +121,31 @@ class Segment implements JsonSerializable
         $submitter->submitSegment($this);
     }
 
-    /**
-     * @return bool
-     */
     public function isSampled(): bool
     {
         return $this->sampled;
     }
 
-    /**
-     * @param bool $sampled
-     * @return static
-     */
-    public function setSampled(bool $sampled): Segment
+    public function setSampled(bool $sampled): self
     {
         $this->sampled = $sampled;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getId(): string
     {
         return $this->id;
     }
 
-    /**
-     * @param string|null $parentId
-     * @return static
-     */
-    public function setParentId(string $parentId = null): Segment
+    public function setParentId(?string $parentId): self
     {
         $this->parentId = $parentId;
 
         return $this;
     }
 
-    /**
-     * @param string $traceId
-     * @return static
-     */
-    public function setTraceId(string $traceId): Segment
+    public function setTraceId(string $traceId): self
     {
         $this->traceId = $traceId;
 
@@ -245,53 +157,33 @@ class Segment implements JsonSerializable
         return $this->traceId;
     }
 
-    /**
-     * @return bool
-     */
     public function isOpen(): bool
     {
-        return !is_null($this->startTime) && is_null($this->endTime);
+        return isset($this->startTime) && !isset($this->endTime);
     }
 
-    /**
-     * @param bool $independent
-     * @return static
-     */
-    public function setIndependent(bool $independent): Segment
+    public function setIndependent(bool $independent): self
     {
         $this->independent = $independent;
 
         return $this;
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     * @return static
-     */
-    public function addAnnotation(string $key, string $value): Segment
+    public function addAnnotation(string $key, string $value): self
     {
         $this->annotations[$key] = $value;
 
         return $this;
     }
 
-    /**
-     * @param string $key
-     * @param $value
-     * @return static
-     */
-    public function addMetadata(string $key, $value): Segment
+    public function addMetadata(string $key, mixed $value): self
     {
         $this->metadata[$key] = $value;
 
         return $this;
     }
 
-    /**
-     * @return Segment
-     */
-    public function getCurrentSegment(): Segment
+    public function getCurrentSegment(): self
     {
         for ($max = count($this->subsegments); $this->lastOpenSegment < $max; $this->lastOpenSegment++) {
             if ($this->subsegments[$this->lastOpenSegment]->isOpen()) {
@@ -303,23 +195,24 @@ class Segment implements JsonSerializable
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
+     * @return array<string, mixed>
      */
     public function jsonSerialize(): array
     {
         return array_filter([
-            'id' => $this->id,
-            'parent_id' => $this->parentId,
-            'trace_id' => $this->traceId,
-            'name' => $this->name ?? null,
-            'start_time' => $this->startTime,
-            'end_time' => $this->endTime,
-            'subsegments' => empty($this->subsegments) ? null : $this->subsegments,
-            'type' => $this->independent ? 'subsegment' : null,
-            'fault' => $this->fault,
-            'error' => $this->error,
-            'annotations' => empty($this->annotations) ? null : $this->annotations,
-            'metadata' => empty($this->metadata) ? null : $this->metadata
+            'id'          => $this->id,
+            'parent_id'   => $this->parentId,
+            'trace_id'    => $this->traceId ?? null,
+            'name'        => $this->name,
+            'start_time'  => $this->startTime ?? null,
+            'end_time'    => $this->endTime ?? null,
+            'subsegments' => $this->subsegments ?? null ?: null,
+            'type'        => $this->independent ? 'subsegment' : null,
+            'fault'       => $this->fault ?? null,
+            'error'       => $this->error ?? null,
+            'annotations' => $this->annotations ?? null ?: null,
+            'metadata'    => $this->metadata ?? null ?: null,
         ]);
     }
 }

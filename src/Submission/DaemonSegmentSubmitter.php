@@ -2,47 +2,47 @@
 
 namespace Pkerrigan\Xray\Submission;
 
+use Error;
 use Pkerrigan\Xray\Segment;
+use Socket;
+
+use function socket_create;
+use function socket_last_error;
 
 /**
  *
  * @author Patrick Kerrigan (patrickkerrigan.uk)
- * @since 13/05/2018
+ * @since  13/05/2018
  */
 class DaemonSegmentSubmitter implements SegmentSubmitter
 {
-    const MAX_SEGMENT_SIZE = 64000;
+    protected const MAX_SEGMENT_SIZE = 64000;
 
-    const HEADER = [
-        'format' => 'json',
-        'version' => 1
+    /**
+     * @var array<string, mixed>
+     */
+    public const HEADER = [
+        'format'  => 'json',
+        'version' => 1,
     ];
-
-    /**
-     * @var string
-     */
-    private $host;
-
-    /**
-     * @var int
-     */
-    private $port;
-
-    /**
-     * @var resource
-     */
+    private string $host;
+    private int    $port;
+    /** @var Socket */
     private $socket;
 
     public function __construct(string $host = '127.0.0.1', int $port = 2000)
     {
         if (isset($_SERVER['AWS_XRAY_DAEMON_ADDRESS'])) {
-            list($host, $port) = explode(":", $_SERVER['AWS_XRAY_DAEMON_ADDRESS']);
+            [$host, $port] = explode(":", $_SERVER['AWS_XRAY_DAEMON_ADDRESS']);
         }
 
         $this->host = $_SERVER['_AWS_XRAY_DAEMON_ADDRESS'] ?? $host;
-        $this->port = (int) ($_SERVER['_AWS_XRAY_DAEMON_PORT'] ?? $port);
+        $this->port = (int)($_SERVER['_AWS_XRAY_DAEMON_PORT'] ?? $port);
 
-        $this->socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
+        if (!$socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP)) {
+            throw new Error('Can\'t create socket: ' . socket_last_error());
+        }
+        $this->socket = $socket;
     }
 
     public function __destruct()
@@ -50,13 +50,9 @@ class DaemonSegmentSubmitter implements SegmentSubmitter
         socket_close($this->socket);
     }
 
-    /**
-     * @param Segment $segment
-     * @return void
-     */
-    public function submitSegment(Segment $segment)
+    public function submitSegment(Segment $segment): void
     {
-        $packet = $this->buildPacket($segment);
+        $packet       = $this->buildPacket($segment);
         $packetLength = strlen($packet);
 
         if ($packetLength > self::MAX_SEGMENT_SIZE) {
@@ -68,28 +64,19 @@ class DaemonSegmentSubmitter implements SegmentSubmitter
     }
 
     /**
-     * @param Segment|array $segment
-     * @return string
+     * @param Segment|array<string, mixed> $segment
      */
-    private function buildPacket($segment): string
+    private function buildPacket(Segment|array $segment): string
     {
         return implode("\n", array_map('json_encode', [self::HEADER, $segment]));
     }
 
-    /**
-     * @param string $packet
-     * @return void
-     */
-    private function sendPacket(string $packet)
+    private function sendPacket(string $packet): void
     {
         socket_sendto($this->socket, $packet, strlen($packet), 0, $this->host, $this->port);
     }
 
-    /**
-     * @param Segment $segment
-     * @return void
-     */
-    private function submitFragmented(Segment $segment)
+    private function submitFragmented(Segment $segment): void
     {
         $rawSegment = $segment->jsonSerialize();
         /** @var Segment[] $subsegments */
@@ -99,9 +86,11 @@ class DaemonSegmentSubmitter implements SegmentSubmitter
 
         foreach ($subsegments as $subsegment) {
             $subsegment = clone $subsegment;
-            $subsegment->setParentId($segment->getId())
-                       ->setTraceId($segment->getTraceId())
-                       ->setIndependent(true);
+            $subsegment
+                ->setParentId($segment->getId())
+                ->setTraceId($segment->getTraceId())
+                ->setIndependent(true)
+            ;
             $this->submitSegment($subsegment);
         }
 
@@ -110,14 +99,13 @@ class DaemonSegmentSubmitter implements SegmentSubmitter
     }
 
     /**
-     * @param array $openSegment
-     * @return void
+     * @param array<string, mixed> $openSegment
      */
-    private function submitOpenSegment(array $openSegment)
+    private function submitOpenSegment(array $openSegment): void
     {
         unset($openSegment['end_time']);
         $openSegment['in_progress'] = true;
-        $initialPacket = $this->buildPacket($openSegment);
-        $this->sendPacket($initialPacket);
+
+        $this->sendPacket($this->buildPacket($openSegment));
     }
 }

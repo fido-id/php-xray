@@ -18,6 +18,16 @@
     {
       "name": "Mauro Artizzu",
       "email": "mauro@fido.id"
+    },
+    {
+      "name": "Francesco Panina",
+      "email": "francesco@fido.id",
+      "homepage": "https://github.com/ranpafin"
+    },
+    {
+      "name": "Michele Sangalli",
+      "email": "michele@fido.id",
+      "homepage": "https://github.com/mikysan"
     }
   ],
   "require": {
@@ -36,11 +46,24 @@
     }
   },
   "require-dev": {
-    "phpunit/phpunit": "^9.0.0"
+    "phpunit/phpunit": "^9.0.0",
+    "phpstan/phpstan": "^0.12.0",
+    "phpstan/extension-installer": "^1.0.0",
+    "phpstan/phpstan-deprecation-rules": "^0.12.0",
+    "phpstan/phpstan-php-parser": "^0.12.0",
+    "phpstan/phpstan-phpunit": "^0.12.0",
+    "squizlabs/php_codesniffer": "^3.0.0",
+    "slevomat/coding-standard": "^6.0.0"
   },
   "scripts": {
     "test": [
-      "phpunit"
+      "phpunit",
+      "phpcs --colors -s --standard=phpcs.xml; if [ $? -ne 0 ]; then echo \"\\n\\t\\033[1;31mRun \\`./run composer run fix-cs\\` to fix.\\033[0m\n\" && exit 1; fi",
+      "phpstan analyze -c phpstan.neon --no-progress src",
+      "phpstan analyze -c phpstan.relaxed.neon --no-progress tests"
+    ],
+    "fix-cs": [
+      "phpcbf --colors --standard=phpcs.xml; if [ $? -eq 1 ]; then exit 0; fi"
     ]
   }
 }

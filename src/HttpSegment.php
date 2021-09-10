@@ -5,7 +5,7 @@ namespace Pkerrigan\Xray;
 /**
  *
  * @author Patrick Kerrigan (patrickkerrigan.uk)
- * @since 13/05/2018
+ * @since  13/05/2018
  */
 class HttpSegment extends RemoteSegment
 {

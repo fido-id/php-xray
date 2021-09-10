@@ -5,110 +5,61 @@ namespace Pkerrigan\Xray;
 /**
  *
  * @author Patrick Kerrigan (patrickkerrigan.uk)
- * @since 14/05/2018
+ * @since  14/05/2018
  */
 class SqlSegment extends RemoteSegment
 {
-    /**
-     * @var string|null
-     */
-    protected $url;
-    /**
-     * @var string|null
-     */
-    protected $preparation;
-    /**
-     * @var string|null
-     */
-    protected $databaseType;
-    /**
-     * @var string|null
-     */
-    protected $databaseVersion;
-    /**
-     * @var string|null
-     */
-    protected $driverVersion;
-    /**
-     * @var string|null
-     */
-    protected $user;
-    /**
-     * @var string|null
-     */
-    protected $query;
+    protected string $url;
+    protected string $preparation;
+    protected string $databaseType;
+    protected string $databaseVersion;
+    protected string $driverVersion;
+    protected string $user;
+    protected string $query;
 
-    /**
-     * @param string $url
-     * @return static
-     */
-    public function setUrl(string $url): SqlSegment
+    public function setUrl(string $url): self
     {
         $this->url = $url;
 
         return $this;
     }
 
-    /**
-     * @param string $preparation
-     * @return static
-     */
-    public function setPreparation(string $preparation): SqlSegment
+    public function setPreparation(string $preparation): self
     {
         $this->preparation = $preparation;
 
         return $this;
     }
 
-    /**
-     * @param string $databaseType
-     * @return static
-     */
-    public function setDatabaseType(string $databaseType): SqlSegment
+    public function setDatabaseType(string $databaseType): self
     {
         $this->databaseType = $databaseType;
 
         return $this;
     }
 
-    /**
-     * @param null|string $databaseVersion
-     * @return static
-     */
-    public function setDatabaseVersion(string $databaseVersion): SqlSegment
+    public function setDatabaseVersion(string $databaseVersion): self
     {
         $this->databaseVersion = $databaseVersion;
 
         return $this;
     }
 
-    /**
-     * @param string $driverVersion
-     * @return static
-     */
-    public function setDriverVersion(string $driverVersion): SqlSegment
+    public function setDriverVersion(string $driverVersion): self
     {
         $this->driverVersion = $driverVersion;
 
         return $this;
     }
 
-    /**
-     * @param string $user
-     * @return static
-     */
-    public function setUser(string $user): SqlSegment
+    public function setUser(string $user): self
     {
         $this->user = $user;
 
         return $this;
     }
 
-    /**
-     * @param string $query
-     * @return static
-     */
-    public function setQuery(string $query): SqlSegment
+    public function setQuery(string $query): self
     {
         $this->query = $query;
 
@@ -123,13 +74,13 @@ class SqlSegment extends RemoteSegment
         $data = parent::jsonSerialize();
 
         $data['sql'] = array_filter([
-            'url' => $this->url,
-            'preparation' => $this->preparation,
-            'database_type' => $this->databaseType,
-            'database_version' => $this->databaseVersion,
-            'driver_version' => $this->driverVersion,
-            'user' => $this->user,
-            'sanitized_query' => $this->query
+            'url'              => $this->url ?? null,
+            'preparation'      => $this->preparation ?? null,
+            'database_type'    => $this->databaseType ?? null,
+            'database_version' => $this->databaseVersion ?? null,
+            'driver_version'   => $this->driverVersion ?? null,
+            'user'             => $this->user ?? null,
+            'sanitized_query'  => $this->query ?? null,
         ]);
 
         return $data;
