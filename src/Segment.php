@@ -235,9 +235,6 @@ class Segment implements JsonSerializable
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getTraceId(): string
     {
         return $this->traceId;

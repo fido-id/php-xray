@@ -1,0 +1,16 @@
+#!/bin/sh
+
+image_name="php-xray"
+
+tty=''
+if [ "$(tty)" != "not a tty" ]; then
+  tty="-ti"
+fi
+
+docker run ${tty} \
+  --rm \
+  --user "user:$(id -g)" \
+  --volume "${PWD}:${PWD}" \
+  --workdir "${PWD}" \
+  "${image_name}" \
+  "$@"
