@@ -1,0 +1,17 @@
+FROM php:8.0-cli
+
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+
+RUN apt-get update && \
+    apt-get install git unzip -y
+
+RUN docker-php-ext-install sockets
+
+ARG UID
+
+RUN groupadd -g $UID -o -r user \
+    && useradd -d /user -g $UID -o -r -u $UID user \
+    && mkdir /user \
+    && chown user: /user
+
+USER user

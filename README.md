@@ -75,3 +75,25 @@ Trace::getInstance()
 
 * Exception and stack trace support
 * Submission of incomplete segments
+
+
+## DEV
+
+
+To develop this packed first run the build of the dockerfile:
+
+```shell
+./build
+```
+
+this will produce a new image `php-xray`, you can then run any command using:
+
+```shell
+./run command [options]
+```
+
+To execute the test suite you can run:
+
+```shell
+./run composer run test
+```

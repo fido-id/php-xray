@@ -17,14 +17,14 @@ class DaemonSegmentSubmitterTest extends TestCase
      */
     private $socket;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
         socket_bind($this->socket, '127.0.0.1', 2000);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         socket_close($this->socket);
         parent::tearDown();
@@ -55,13 +55,13 @@ class DaemonSegmentSubmitterTest extends TestCase
 
         $segment = new Trace();
         $segment->setSampled(true)
-                ->setName('Test segment')
-                ->begin()
-                ->addSubsegment($subsegment1)
-                ->addSubsegment($subsegment2)
-                ->addSubsegment($subsegment3)
-                ->end()
-                ->submit(new DaemonSegmentSubmitter());
+            ->setName('Test segment')
+            ->begin()
+            ->addSubsegment($subsegment1)
+            ->addSubsegment($subsegment2)
+            ->addSubsegment($subsegment3)
+            ->end()
+            ->submit(new DaemonSegmentSubmitter());
 
         $buffer = $this->receivePackets(5);
 
@@ -72,16 +72,16 @@ class DaemonSegmentSubmitterTest extends TestCase
         $openingSegment['in_progress'] = true;
 
         $subsegment1->setIndependent(true)
-                    ->setTraceId($segment->getTraceId())
-                    ->setParentId($segment->getId());
+            ->setTraceId($segment->getTraceId())
+            ->setParentId($segment->getId());
 
         $subsegment2->setIndependent(true)
-                    ->setTraceId($segment->getTraceId())
-                    ->setParentId($segment->getId());
+            ->setTraceId($segment->getTraceId())
+            ->setParentId($segment->getId());
 
         $subsegment3->setIndependent(true)
-                    ->setTraceId($segment->getTraceId())
-                    ->setParentId($segment->getId());
+            ->setTraceId($segment->getTraceId())
+            ->setParentId($segment->getId());
 
         $expectedPackets = [$openingSegment, $subsegment1, $subsegment2, $subsegment3, $rawSegment];
 

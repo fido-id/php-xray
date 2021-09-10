@@ -1,0 +1,11 @@
+#!/bin/sh
+
+image_name="php-xray"
+dockerfile="Dockerfile.xray"
+
+docker build \
+  --tag "${image_name}" \
+  --file "${dockerfile}" \
+  --build-arg UID="$(id -u)" \
+  "."
+
