@@ -5,7 +5,6 @@ namespace Fido\PHPXray;
 interface DictionaryInterface
 {
 
-
     // MAIN [TYPE_AREA_VALUE]
 
     /**  aws for AWS SDK calls; remote for other downstream calls. */
@@ -76,6 +75,9 @@ interface DictionaryInterface
     public const SEGMENT_KEY_MAIN_ERROR = 'error';
 
     /** error, throttle, fault, and cause – error fields that indicate an error occurred and that include information about the exception that caused the error. */
+    public const SEGMENT_KEY_MAIN_CAUSE = 'cause';
+
+    /** error, throttle, fault, and cause – error fields that indicate an error occurred and that include information about the exception that caused the error. */
     public const SEGMENT_KEY_MAIN_THROTTLE = 'throttle';
 
     /** error, throttle, fault, and cause – error fields that indicate an error occurred and that include information about the exception that caused the error. */
@@ -95,7 +97,6 @@ interface DictionaryInterface
 
     /** subsegments for queries that your application makes to an SQL database. */
     public const SEGMENT_KEY_MAIN_SQL = 'sql';
-
 
     // HTTP
 
@@ -161,7 +162,6 @@ interface DictionaryInterface
     /** The database query, with any user provided values removed or replaced by a placeholder. */
     public const SEGMENT_KEY_SQL_SANITIZED_QUERY = 'sanitized_query';
 
-
     // AWS
 
     /** For operations on a DynamoDB table, the name of the table. */
@@ -201,4 +201,28 @@ interface DictionaryInterface
 
     /** Required only if sending a subsegment separately. ["type"=>"subsegment"], only value allowed is 'subsegment'...meh */
     public const SEGMENT_ENUM_MAIN_TYPE_SUBSEGMENT = 'subsegment';
+
+
+    // CAUSE
+
+    public const SEGMENT_KEY_CAUSE_WORKING_DIRECTORY = 'working_directory';
+    public const SEGMENT_KEY_CAUSE_PATHS             = 'paths';
+    public const SEGMENT_KEY_CAUSE_EXCEPTIONS        = 'exceptions';
+
+    // CAUSE EXCEPTION
+
+    public const SEGMENT_KEY_CAUSE_EXCEPTION_ID        = 'id';
+    public const SEGMENT_KEY_CAUSE_EXCEPTION_MESSAGE   = 'message';
+    public const SEGMENT_KEY_CAUSE_EXCEPTION_TYPE      = 'type';
+    public const SEGMENT_KEY_CAUSE_EXCEPTION_REMOTE    = 'remote';
+    public const SEGMENT_KEY_CAUSE_EXCEPTION_TRUNCATED = 'truncated';
+    public const SEGMENT_KEY_CAUSE_EXCEPTION_SKIPPED   = 'skipped';
+    public const SEGMENT_KEY_CAUSE_EXCEPTION_CAUSE     = 'cause';
+    public const SEGMENT_KEY_CAUSE_EXCEPTION_STACK     = 'stack';
+
+    // CAUSE STACK FRAME
+
+    public const SEGMENT_KEY_CAUSE_STACK_FRAME_PATH  = 'path';
+    public const SEGMENT_KEY_CAUSE_STACK_FRAME_LINE  = 'line';
+    public const SEGMENT_KEY_CAUSE_STACK_FRAME_LABEL = 'label';
 }

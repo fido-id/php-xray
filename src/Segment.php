@@ -2,8 +2,8 @@
 
 namespace Fido\PHPXray;
 
-use JsonSerializable;
 use Fido\PHPXray\Submission\SegmentSubmitter;
+use JsonSerializable;
 
 class Segment implements JsonSerializable
 {
@@ -14,11 +14,13 @@ class Segment implements JsonSerializable
     protected float   $startTime;
     protected float   $endTime;
     /** @var Segment[] */
-    protected array $subsegments = [];
-    protected bool  $error       = false;
-    protected bool  $fault       = false;
-    protected bool  $sampled     = false;
-    protected bool  $independent = false;
+    protected array  $subsegments = [];
+    protected bool   $error       = false;
+    protected bool   $fault       = false;
+    //todo handle cause object OR exception ID
+    protected ?Cause $cause       = null;
+    protected bool   $sampled     = false;
+    protected bool   $independent = false;
     /** @var array<string, mixed> */
     private array $annotations;
     /** @var array<string, mixed> */
@@ -189,25 +191,37 @@ class Segment implements JsonSerializable
         return $this;
     }
 
+    public function getCause(): ?Cause
+    {
+        return $this->cause;
+    }
+
+    public function setCause(?Cause $cause): Segment
+    {
+        $this->cause = $cause;
+        return $this;
+    }
+
     /**
      * @inheritDoc
-     * @return array<string, string|bool|float|null|array>
+     * @return array<string, string|bool|float|null|array|Cause>
      */
     public function jsonSerialize(): array
     {
         return \array_filter([
-            DictionaryInterface::SEGMENT_KEY_MAIN_ID         => $this->id,
+            DictionaryInterface::SEGMENT_KEY_MAIN_ID          => $this->id,
             DictionaryInterface::SEGMENT_KEY_MAIN_PARENT_ID   => $this->parentId,
             DictionaryInterface::SEGMENT_KEY_MAIN_TRACE_ID    => $this->traceId ?? null,
             DictionaryInterface::SEGMENT_KEY_MAIN_NAME        => $this->name,
             DictionaryInterface::SEGMENT_KEY_MAIN_START_TIME  => $this->startTime ?? null,
             DictionaryInterface::SEGMENT_KEY_MAIN_END_TIME    => $this->endTime ?? null,
             DictionaryInterface::SEGMENT_KEY_MAIN_SUBSEGMENTS => ($this->subsegments ?? null) ?: null,
-            DictionaryInterface::SEGMENT_KEY_MAIN_TYPE       => $this->independent ? DictionaryInterface::SEGMENT_ENUM_MAIN_TYPE_SUBSEGMENT : null,
-            DictionaryInterface::SEGMENT_KEY_MAIN_FAULT      => $this->fault ?? null,
-            DictionaryInterface::SEGMENT_KEY_MAIN_ERROR      => $this->error ?? null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_TYPE        => $this->independent ? DictionaryInterface::SEGMENT_ENUM_MAIN_TYPE_SUBSEGMENT : null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_FAULT       => $this->fault ?? null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_ERROR       => $this->error ?? null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_CAUSE       => $this->cause ?? null,
             DictionaryInterface::SEGMENT_KEY_MAIN_ANNOTATIONS => ($this->annotations ?? null) ?: null,
-            DictionaryInterface::SEGMENT_KEY_MAIN_METADATA   => ($this->metadata ?? null) ?: null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_METADATA    => ($this->metadata ?? null) ?: null,
         ]);
     }
 }
