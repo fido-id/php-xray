@@ -42,6 +42,7 @@
   },
   "scripts": {
     "test": [
+      "composer install",
       "phpunit",
       "phpcs --colors -s --standard=phpcs.xml; if [ $? -ne 0 ]; then echo \"\\n\\t\\033[1;31mRun \\`./run composer run fix-cs\\` to fix.\\033[0m\n\" && exit 1; fi",
       "phpstan analyze -c phpstan.neon --no-progress src",
