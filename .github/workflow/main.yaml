@@ -1,0 +1,14 @@
+on: [ push ]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    name: ci
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Hello world action step
+        uses: ./.github/
+        id: name
+        with:
+          command: 'composer test'

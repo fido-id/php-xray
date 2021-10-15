@@ -1,0 +1,14 @@
+name: 'Test'
+description: 'Greet someone and record the time'
+inputs:
+  command:
+    description: 'command to run'
+    required: true
+outputs:
+  result:
+    description: 'result of the command'
+runs:
+  using: 'docker'
+  image: 'Dockerfile.xray'
+  args:
+    - ${{ inputs.command }}
