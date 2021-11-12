@@ -4,35 +4,33 @@ namespace Fido\PHPXray\Submission;
 
 use Error;
 use Fido\PHPXray\Segment;
+use Fido\PHPXray\Typed;
 use Socket;
 
 use function socket_create;
 use function socket_last_error;
 
-class DaemonSegmentSubmitter implements SegmentSubmitter
+class DaemonSegmentSubmitter implements SegmentSubmitter, Typed
 {
     protected const MAX_SEGMENT_SIZE = 64000;
 
     /**
      * @var array<string, mixed>
      */
-    public const HEADER = [
-        'format'  => 'json',
-        'version' => 1,
-    ];
+    public const HEADER = ['format' => 'json', 'version' => 1];
     private string $host;
-    private int    $port;
+    private int $port;
     /** @var Socket */
     private $socket;
 
     public function __construct(string $host = '127.0.0.1', int $port = 2000)
     {
-        if (isset($_SERVER['AWS_XRAY_DAEMON_ADDRESS'])) {
-            [$host, $port] = explode(":", $_SERVER['AWS_XRAY_DAEMON_ADDRESS']);
+        if (isset($_SERVER[self::DAEMON_ADDRESS_AND_PORT])) {
+            [$host, $port] = explode(":", $_SERVER[self::DAEMON_ADDRESS_AND_PORT]);
         }
 
-        $this->host = $_SERVER['_AWS_XRAY_DAEMON_ADDRESS'] ?? $host;
-        $this->port = (int)($_SERVER['_AWS_XRAY_DAEMON_PORT'] ?? $port);
+        $this->host = $_SERVER[self::DAEMON_ADDRESS] ?? $host;
+        $this->port = (int)($_SERVER[self::DAEMON_PORT] ?? $port);
 
         if (!$socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP)) {
             throw new Error('Can\'t create socket: ' . socket_last_error());
@@ -75,8 +73,8 @@ class DaemonSegmentSubmitter implements SegmentSubmitter
     {
         $rawSegment = $segment->jsonSerialize();
         /** @var Segment[] $subsegments */
-        $subsegments = $rawSegment['subsegments'] ?? [];
-        unset($rawSegment['subsegments']);
+        $subsegments = $rawSegment[self::SEGMENT_KEY_MAIN_SUBSEGMENTS] ?? [];
+        unset($rawSegment[self::SEGMENT_KEY_MAIN_SUBSEGMENTS]);
         $this->submitOpenSegment($rawSegment);
 
         foreach ($subsegments as $subsegment) {
@@ -98,8 +96,8 @@ class DaemonSegmentSubmitter implements SegmentSubmitter
      */
     private function submitOpenSegment(array $openSegment): void
     {
-        unset($openSegment['end_time']);
-        $openSegment['in_progress'] = true;
+        unset($openSegment[self::SEGMENT_KEY_MAIN_END_TIME]);
+        $openSegment[self::SEGMENT_KEY_MAIN_IN_PROGRESS] = true;
 
         $this->sendPacket($this->buildPacket($openSegment));
     }

@@ -2,7 +2,7 @@
 
 namespace Fido\PHPXray;
 
-class RemoteSegment extends Segment
+class RemoteSegment extends Segment implements Typed
 {
     protected bool $traced = false;
 
@@ -20,9 +20,9 @@ class RemoteSegment extends Segment
     {
         $data = parent::jsonSerialize();
 
-        $data['namespace'] = 'remote';
-        $data['traced']    = $this->traced;
+        $data[self::SEGMENT_KEY_MAIN_NAMESPACE] = self::SEGMENT_ENUM_NAMESPACE_REMOTE;
+        $data[self::SEGMENT_KEY_HTTP_REQUEST_TRACED] = $this->traced;
 
-        return array_filter($data);
+        return \array_filter($data);
     }
 }

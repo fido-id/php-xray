@@ -4,19 +4,13 @@
 
     <description>PHPCS configuration file.</description>
 
+
     <file>src</file>
     <file>tests</file>
 
-    <!--
-        Arg explanation:
-            -w fix bot Error and Warnings
-            -p display progress
-            -s show used sniffers
-    -->
-    <arg value="wps"/>
-
     <!-- Our base rule: set to PSR12 \w a couple of exclusion-->
     <rule ref="PSR12"/>
+
     <!-- We like column property -->
     <rule ref="PSR2">
         <exclude name="PSR2.Classes.PropertyDeclaration.SpacingAfterType"/>
@@ -25,5 +19,19 @@
     <!-- Test related CS -->
     <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
         <exclude-pattern>tests/*</exclude-pattern>
+    </rule>
+
+    <!-- Exclude all PEAR rules -->
+    <rule ref="PEAR">
+        <exclude name="PEAR"/>
+    </rule>
+
+    <rule ref="Zend">
+        <exclude name="Zend"/>
+    </rule>
+
+    <!-- Exclude all Squiz rules -->
+    <rule ref="Squiz">
+        <exclude name="Squiz"/>
     </rule>
 </ruleset>

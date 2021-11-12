@@ -4,13 +4,37 @@ namespace Fido\PHPXray;
 
 use Exception;
 
-class Trace extends Segment
+class Trace extends Segment implements Typed, HttpInterface
 {
-    use HttpTrait;
-
+    protected string $url;
+    protected string $method;
+    protected string $clientIpAddress;
+    protected string $userAgent;
+    protected int $responseCode;
     private static self $instance;
     private string $serviceVersion;
     private string $user;
+
+    public function setUrl(string $url): self
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    public function setMethod(string $method): self
+    {
+        $this->method = $method;
+
+        return $this;
+    }
+
+    public function setResponseCode(int $responseCode): self
+    {
+        $this->responseCode = $responseCode;
+
+        return $this;
+    }
 
     public static function getInstance(): self
     {
@@ -74,9 +98,9 @@ class Trace extends Segment
     {
         $data = parent::jsonSerialize();
 
-        $data['http']    = $this->serialiseHttpData();
-        $data['service'] = empty($this->serviceVersion) ? null : ['version' => $this->serviceVersion];
-        $data['user']    = $this->user ?? null;
+        $data[self::SEGMENT_KEY_MAIN_HTTP]    = $this->serialiseHttpData();
+        $data[self::SEGMENT_KEY_MAIN_SERVICE] = empty($this->serviceVersion) ? null : ['version' => $this->serviceVersion];
+        $data[self::SEGMENT_KEY_SQL_USER]    = $this->user ?? null;
 
         return array_filter($data);
     }
@@ -89,5 +113,20 @@ class Trace extends Segment
         $startHex = dechex((int)$this->startTime);
         $uuid     = bin2hex(random_bytes(12));
         $this->setTraceId("1-$startHex-$uuid");
+    }
+
+    public function serialiseHttpData(): array
+    {
+        return [
+            self::SEGMENT_KEY_HTTP_REQUEST => \array_filter([
+                self::SEGMENT_KEY_HTTP_REQUEST_URL => $this->url ?? null,
+                self::SEGMENT_KEY_HTTP_REQUEST_METHOD => $this->method ?? null,
+                self::SEGMENT_KEY_HTTP_REQUEST_CLIENT_IP => $this->clientIpAddress ?? null,
+                self::SEGMENT_KEY_HTTP_REQUEST_USER_AGENT => $this->userAgent ?? null,
+            ]),
+            self::SEGMENT_KEY_HTTP_RESPONSE => \array_filter([
+                self::SEGMENT_KEY_HTTP_RESPONSE_STATUS => $this->responseCode ?? null,
+            ]),
+        ];
     }
 }
