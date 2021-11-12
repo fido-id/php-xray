@@ -6,9 +6,6 @@ class HttpSegment extends RemoteSegment
 {
     use HttpTrait;
 
-    /**
-     * @inheritdoc
-     */
     public function jsonSerialize(): array
     {
         $data = parent::jsonSerialize();

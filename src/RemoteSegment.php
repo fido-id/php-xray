@@ -13,9 +13,6 @@ class RemoteSegment extends Segment
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function jsonSerialize(): array
     {
         $data = parent::jsonSerialize();

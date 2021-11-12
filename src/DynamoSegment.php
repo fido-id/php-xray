@@ -4,7 +4,6 @@ namespace Fido\PHPXray;
 
 class DynamoSegment extends RemoteSegment
 {
-
     protected string $tableName;
     protected string $operation;
     protected string $requestId;
@@ -39,9 +38,6 @@ class DynamoSegment extends RemoteSegment
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function jsonSerialize(): array
     {
         $data = parent::jsonSerialize();

@@ -190,7 +190,6 @@ class Segment implements JsonSerializable
     }
 
     /**
-     * @inheritDoc
      * @return array<string, mixed>
      */
     public function jsonSerialize(): array

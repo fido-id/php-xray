@@ -13,17 +13,11 @@ class DaemonSegmentSubmitter implements SegmentSubmitter
 {
     protected const MAX_SEGMENT_SIZE = 64000;
 
-    /**
-     * @var array<string, mixed>
-     */
-    public const HEADER = [
-        'format'  => 'json',
-        'version' => 1,
-    ];
+    /** @var array<string, mixed> */
+    public const HEADER = [ 'format'  => 'json', 'version' => 1];
     private string $host;
     private int    $port;
-    /** @var Socket */
-    private $socket;
+    private Socket $socket;
 
     public function __construct(string $host = '127.0.0.1', int $port = 2000)
     {
