@@ -323,4 +323,55 @@ class SegmentTest extends TestCase
 
         $this->assertEquals($subsegment3, $segment->getCurrentSegment());
     }
+
+    public function testGivenCauseSerialisesCorrectly(): void
+    {
+        $pExceptionId = bin2hex(random_bytes(8));
+        $line         = __LINE__;
+        $cException   = new CauseException(
+            "Test",
+            "test",
+            false,
+            0,
+            0,
+            $pExceptionId,
+            [new CauseStackFrame(__CLASS__, $line, __METHOD__)]
+        );
+
+        $segment = new Segment();
+        $segment->setCause(new Cause(__DIR__, [__CLASS__], [$cException]));
+
+        $serialised = \json_decode(\json_encode($segment), true);
+
+        $this->assertEquals(
+            [
+                'id'    => $segment->getId(),
+                'cause' => [
+                    'working_directory' => __DIR__,
+                    'paths'             => [
+                        0 => 'Fido\PHPXray\SegmentTest',
+                    ],
+                    'exceptions'        => [
+                        0 => [
+                            'id'        => $cException->getId(),
+                            'message'   => 'Test',
+                            'type'      => 'test',
+                            'remote'    => false,
+                            'truncated' => 0,
+                            'skipped'   => 0,
+                            'cause'     => $pExceptionId,
+                            'stack'     => [
+                                [
+                                    'path'  => 'Fido\PHPXray\SegmentTest',
+                                    'line'  => $line,
+                                    'label' => 'Fido\PHPXray\SegmentTest::testGivenCauseSerialisesCorrectly',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            $serialised
+        );
+    }
 }
