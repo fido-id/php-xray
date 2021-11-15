@@ -5,7 +5,7 @@ namespace Fido\PHPXray;
 use JsonSerializable;
 use Fido\PHPXray\Submission\SegmentSubmitter;
 
-class Segment implements JsonSerializable, Typed
+class Segment implements JsonSerializable
 {
     protected string  $id;
     protected ?string $parentId = null;
@@ -196,18 +196,18 @@ class Segment implements JsonSerializable, Typed
     public function jsonSerialize(): array
     {
         return \array_filter([
-            self::SEGMENT_KEY_MAIN_ID         => $this->id,
-            self::SEGMENT_KEY_MAIN_PARENT_ID   => $this->parentId,
-            self::SEGMENT_KEY_MAIN_TRACE_ID    => $this->traceId ?? null,
-            self::SEGMENT_KEY_MAIN_NAME        => $this->name,
-            self::SEGMENT_KEY_MAIN_START_TIME  => $this->startTime ?? null,
-            self::SEGMENT_KEY_MAIN_END_TIME    => $this->endTime ?? null,
-            self::SEGMENT_KEY_MAIN_SUBSEGMENTS => ($this->subsegments ?? null) ?: null,
-            self::SEGMENT_KEY_MAIN_TYPE       => $this->independent ? self::SEGMENT_ENUM_MAIN_TYPE_SUBSEGMENT : null,
-            self::SEGMENT_KEY_MAIN_FAULT      => $this->fault ?? null,
-            self::SEGMENT_KEY_MAIN_ERROR      => $this->error ?? null,
-            self::SEGMENT_KEY_MAIN_ANNOTATIONS => ($this->annotations ?? null) ?: null,
-            self::SEGMENT_KEY_MAIN_METADATA   => ($this->metadata ?? null) ?: null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_ID         => $this->id,
+            DictionaryInterface::SEGMENT_KEY_MAIN_PARENT_ID   => $this->parentId,
+            DictionaryInterface::SEGMENT_KEY_MAIN_TRACE_ID    => $this->traceId ?? null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_NAME        => $this->name,
+            DictionaryInterface::SEGMENT_KEY_MAIN_START_TIME  => $this->startTime ?? null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_END_TIME    => $this->endTime ?? null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_SUBSEGMENTS => ($this->subsegments ?? null) ?: null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_TYPE       => $this->independent ? DictionaryInterface::SEGMENT_ENUM_MAIN_TYPE_SUBSEGMENT : null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_FAULT      => $this->fault ?? null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_ERROR      => $this->error ?? null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_ANNOTATIONS => ($this->annotations ?? null) ?: null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_METADATA   => ($this->metadata ?? null) ?: null,
         ]);
     }
 }

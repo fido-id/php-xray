@@ -2,7 +2,7 @@
 
 namespace Fido\PHPXray;
 
-interface Typed
+interface DictionaryInterface
 {
 
 

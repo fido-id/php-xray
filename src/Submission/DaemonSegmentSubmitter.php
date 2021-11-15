@@ -4,13 +4,13 @@ namespace Fido\PHPXray\Submission;
 
 use Error;
 use Fido\PHPXray\Segment;
-use Fido\PHPXray\Typed;
+use Fido\PHPXray\DictionaryInterface;
 use Socket;
 
 use function socket_create;
 use function socket_last_error;
 
-class DaemonSegmentSubmitter implements SegmentSubmitter, Typed
+class DaemonSegmentSubmitter implements SegmentSubmitter
 {
     protected const MAX_SEGMENT_SIZE = 64000;
 
@@ -25,12 +25,12 @@ class DaemonSegmentSubmitter implements SegmentSubmitter, Typed
 
     public function __construct(string $host = '127.0.0.1', int $port = 2000)
     {
-        if (isset($_SERVER[self::DAEMON_ADDRESS_AND_PORT])) {
-            [$host, $port] = explode(":", $_SERVER[self::DAEMON_ADDRESS_AND_PORT]);
+        if (isset($_SERVER[DictionaryInterface::DAEMON_ADDRESS_AND_PORT])) {
+            [$host, $port] = explode(":", $_SERVER[DictionaryInterface::DAEMON_ADDRESS_AND_PORT]);
         }
 
-        $this->host = $_SERVER[self::DAEMON_ADDRESS] ?? $host;
-        $this->port = (int)($_SERVER[self::DAEMON_PORT] ?? $port);
+        $this->host = $_SERVER[DictionaryInterface::DAEMON_ADDRESS] ?? $host;
+        $this->port = (int)($_SERVER[DictionaryInterface::DAEMON_PORT] ?? $port);
 
         if (!$socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP)) {
             throw new Error('Can\'t create socket: ' . socket_last_error());
@@ -73,8 +73,8 @@ class DaemonSegmentSubmitter implements SegmentSubmitter, Typed
     {
         $rawSegment = $segment->jsonSerialize();
         /** @var Segment[] $subsegments */
-        $subsegments = $rawSegment[self::SEGMENT_KEY_MAIN_SUBSEGMENTS] ?? [];
-        unset($rawSegment[self::SEGMENT_KEY_MAIN_SUBSEGMENTS]);
+        $subsegments = $rawSegment[DictionaryInterface::SEGMENT_KEY_MAIN_SUBSEGMENTS] ?? [];
+        unset($rawSegment[DictionaryInterface::SEGMENT_KEY_MAIN_SUBSEGMENTS]);
         $this->submitOpenSegment($rawSegment);
 
         foreach ($subsegments as $subsegment) {
@@ -96,8 +96,8 @@ class DaemonSegmentSubmitter implements SegmentSubmitter, Typed
      */
     private function submitOpenSegment(array $openSegment): void
     {
-        unset($openSegment[self::SEGMENT_KEY_MAIN_END_TIME]);
-        $openSegment[self::SEGMENT_KEY_MAIN_IN_PROGRESS] = true;
+        unset($openSegment[DictionaryInterface::SEGMENT_KEY_MAIN_END_TIME]);
+        $openSegment[DictionaryInterface::SEGMENT_KEY_MAIN_IN_PROGRESS] = true;
 
         $this->sendPacket($this->buildPacket($openSegment));
     }

@@ -38,7 +38,7 @@ class HttpSegment extends RemoteSegment implements HttpInterface
     {
         $data = parent::jsonSerialize();
 
-        $data[self::SEGMENT_KEY_MAIN_HTTP] = $this->serialiseHttpData();
+        $data[DictionaryInterface::SEGMENT_KEY_MAIN_HTTP] = $this->serialiseHttpData();
 
         return array_filter($data);
     }
@@ -46,14 +46,14 @@ class HttpSegment extends RemoteSegment implements HttpInterface
     public function serialiseHttpData(): array
     {
         return [
-            self::SEGMENT_KEY_HTTP_REQUEST => \array_filter([
-                self::SEGMENT_KEY_HTTP_REQUEST_URL => $this->url ?? null,
-                self::SEGMENT_KEY_HTTP_REQUEST_METHOD => $this->method ?? null,
-                self::SEGMENT_KEY_HTTP_REQUEST_CLIENT_IP => $this->clientIpAddress ?? null,
-                self::SEGMENT_KEY_HTTP_REQUEST_USER_AGENT => $this->userAgent ?? null,
+            DictionaryInterface::SEGMENT_KEY_HTTP_REQUEST => \array_filter([
+                DictionaryInterface::SEGMENT_KEY_HTTP_REQUEST_URL => $this->url ?? null,
+                DictionaryInterface::SEGMENT_KEY_HTTP_REQUEST_METHOD => $this->method ?? null,
+                DictionaryInterface::SEGMENT_KEY_HTTP_REQUEST_CLIENT_IP => $this->clientIpAddress ?? null,
+                DictionaryInterface::SEGMENT_KEY_HTTP_REQUEST_USER_AGENT => $this->userAgent ?? null,
             ]),
-            self::SEGMENT_KEY_HTTP_RESPONSE => \array_filter([
-                self::SEGMENT_KEY_HTTP_RESPONSE_STATUS => $this->responseCode ?? null,
+            DictionaryInterface::SEGMENT_KEY_HTTP_RESPONSE => \array_filter([
+                DictionaryInterface::SEGMENT_KEY_HTTP_RESPONSE_STATUS => $this->responseCode ?? null,
             ]),
         ];
     }
