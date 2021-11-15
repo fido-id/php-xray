@@ -20,9 +20,9 @@ class RemoteSegment extends Segment
     {
         $data = parent::jsonSerialize();
 
-        $data['namespace'] = 'remote';
-        $data['traced']    = $this->traced;
+        $data[DictionaryInterface::SEGMENT_KEY_MAIN_NAMESPACE] = DictionaryInterface::SEGMENT_ENUM_NAMESPACE_REMOTE;
+        $data[DictionaryInterface::SEGMENT_KEY_HTTP_REQUEST_TRACED] = $this->traced;
 
-        return array_filter($data);
+        return \array_filter($data);
     }
 }

@@ -191,23 +191,23 @@ class Segment implements JsonSerializable
 
     /**
      * @inheritDoc
-     * @return array<string, mixed>
+     * @return array<string, string|bool|float|null|array>
      */
     public function jsonSerialize(): array
     {
-        return array_filter([
-            'id'          => $this->id,
-            'parent_id'   => $this->parentId,
-            'trace_id'    => $this->traceId ?? null,
-            'name'        => $this->name,
-            'start_time'  => $this->startTime ?? null,
-            'end_time'    => $this->endTime ?? null,
-            'subsegments' => $this->subsegments ?? null ?: null,
-            'type'        => $this->independent ? 'subsegment' : null,
-            'fault'       => $this->fault ?? null,
-            'error'       => $this->error ?? null,
-            'annotations' => $this->annotations ?? null ?: null,
-            'metadata'    => $this->metadata ?? null ?: null,
+        return \array_filter([
+            DictionaryInterface::SEGMENT_KEY_MAIN_ID         => $this->id,
+            DictionaryInterface::SEGMENT_KEY_MAIN_PARENT_ID   => $this->parentId,
+            DictionaryInterface::SEGMENT_KEY_MAIN_TRACE_ID    => $this->traceId ?? null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_NAME        => $this->name,
+            DictionaryInterface::SEGMENT_KEY_MAIN_START_TIME  => $this->startTime ?? null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_END_TIME    => $this->endTime ?? null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_SUBSEGMENTS => ($this->subsegments ?? null) ?: null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_TYPE       => $this->independent ? DictionaryInterface::SEGMENT_ENUM_MAIN_TYPE_SUBSEGMENT : null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_FAULT      => $this->fault ?? null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_ERROR      => $this->error ?? null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_ANNOTATIONS => ($this->annotations ?? null) ?: null,
+            DictionaryInterface::SEGMENT_KEY_MAIN_METADATA   => ($this->metadata ?? null) ?: null,
         ]);
     }
 }

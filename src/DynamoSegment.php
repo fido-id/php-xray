@@ -4,7 +4,6 @@ namespace Fido\PHPXray;
 
 class DynamoSegment extends RemoteSegment
 {
-
     protected string $tableName;
     protected string $operation;
     protected string $requestId;
@@ -46,11 +45,11 @@ class DynamoSegment extends RemoteSegment
     {
         $data = parent::jsonSerialize();
 
-        $data['aws'] = array_filter([
-            'table_name'     => $this->tableName ?? null,
-            'operation'      => $this->operation ?? null,
-            'request_id'     => $this->requestId ?? null,
-            'resource_names' => $this->resourceNames ?? null ?: null,
+        $data[DictionaryInterface::SEGMENT_KEY_MAIN_AWS] = \array_filter([
+            DictionaryInterface::SEGMENT_KEY_AWS_TABLE_NAME => $this->tableName ?? null,
+            DictionaryInterface::SEGMENT_KEY_AWS_OPERATION => $this->operation ?? null,
+            DictionaryInterface::SEGMENT_KEY_AWS_REQUEST_ID => $this->requestId ?? null,
+            DictionaryInterface::SEGMENT_KEY_AWS_RESOURCE_NAMES => ($this->resourceNames ?? null) ?: null,
         ]);
 
         return $data;

@@ -68,14 +68,14 @@ class SqlSegment extends RemoteSegment
     {
         $data = parent::jsonSerialize();
 
-        $data['sql'] = array_filter([
-            'url'              => $this->url ?? null,
-            'preparation'      => $this->preparation ?? null,
-            'database_type'    => $this->databaseType ?? null,
-            'database_version' => $this->databaseVersion ?? null,
-            'driver_version'   => $this->driverVersion ?? null,
-            'user'             => $this->user ?? null,
-            'sanitized_query'  => $this->query ?? null,
+        $data[DictionaryInterface::SEGMENT_KEY_MAIN_SQL] = \array_filter([
+            DictionaryInterface::SEGMENT_KEY_SQL_URL              => $this->url ?? null,
+            DictionaryInterface::SEGMENT_KEY_SQL_PREPARATION      => $this->preparation ?? null,
+            DictionaryInterface::SEGMENT_KEY_SQL_DATABASE_TYPE    => $this->databaseType ?? null,
+            DictionaryInterface::SEGMENT_KEY_SQL_DATABASE_VERSION => $this->databaseVersion ?? null,
+            DictionaryInterface::SEGMENT_KEY_SQL_DRIVER_VERSION   => $this->driverVersion ?? null,
+            DictionaryInterface::SEGMENT_KEY_SQL_USER             => $this->user ?? null,
+            DictionaryInterface::SEGMENT_KEY_SQL_SANITIZED_QUERY  => $this->query ?? null,
         ]);
 
         return $data;

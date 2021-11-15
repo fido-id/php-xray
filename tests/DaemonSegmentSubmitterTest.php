@@ -88,8 +88,8 @@ class DaemonSegmentSubmitterTest extends TestCase
     }
 
     /**
-     * @param Segment[]|array<string, Segment[]> $expectedPackets
-     * @param string[] $buffer
+     * @param array <int,mixed> $expectedPackets
+     * @param array <int,mixed> $buffer
      */
     private function assertPacketsReceived(array $expectedPackets, array $buffer): void
     {
