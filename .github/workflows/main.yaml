@@ -23,3 +23,10 @@ jobs:
           options: --user root --volume ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }}
           run: |
             composer test
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: coverage.xml
+          verbose: true
+          fail_ci_if_error: true
