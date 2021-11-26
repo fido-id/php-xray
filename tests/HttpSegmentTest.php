@@ -21,7 +21,6 @@ class HttpSegmentTest extends TestCase
             self::assertNotNull($item);
         }
 
-
         $this->assertEquals('remote', $serialised['namespace']);
         $this->assertEquals('http://example.com/', $serialised['http']['request']['url']);
         $this->assertEquals('GET', $serialised['http']['request']['method']);

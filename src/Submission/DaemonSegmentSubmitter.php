@@ -18,11 +18,12 @@ class DaemonSegmentSubmitter implements SegmentSubmitter
      * @var array<string, mixed>
      */
     public const HEADER = ['format' => 'json', 'version' => 1];
-    private string $host;
-    private int $port;
+    protected string $host;
+    protected int $port;
     /** @var Socket */
-    private $socket;
+    protected $socket;
 
+    /** @infection-ignore-all */
     public function __construct(string $host = '127.0.0.1', int $port = 2000)
     {
         if (isset($_SERVER[DictionaryInterface::DAEMON_ADDRESS_AND_PORT])) {
@@ -59,17 +60,17 @@ class DaemonSegmentSubmitter implements SegmentSubmitter
     /**
      * @param Segment|array<string, mixed> $segment
      */
-    private function buildPacket(Segment|array $segment): string
+    protected function buildPacket(Segment|array $segment): string
     {
-        return implode("\n", array_map('json_encode', [self::HEADER, $segment]));
+        return \implode("\n", \array_map('json_encode', [self::HEADER, $segment]));
     }
 
-    private function sendPacket(string $packet): void
+    protected function sendPacket(string $packet): void
     {
-        socket_sendto($this->socket, $packet, strlen($packet), 0, $this->host, $this->port);
+        \socket_sendto($this->socket, $packet, strlen($packet), 0, $this->host, $this->port);
     }
 
-    private function submitFragmented(Segment $segment): void
+    protected function submitFragmented(Segment $segment): void
     {
         $rawSegment = $segment->jsonSerialize();
         /** @var Segment[] $subsegments */
@@ -94,7 +95,7 @@ class DaemonSegmentSubmitter implements SegmentSubmitter
     /**
      * @param array<string, mixed> $openSegment
      */
-    private function submitOpenSegment(array $openSegment): void
+    protected function submitOpenSegment(array $openSegment): void
     {
         unset($openSegment[DictionaryInterface::SEGMENT_KEY_MAIN_END_TIME]);
         $openSegment[DictionaryInterface::SEGMENT_KEY_MAIN_IN_PROGRESS] = true;
