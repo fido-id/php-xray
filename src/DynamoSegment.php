@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Fido\PHPXray;
 
 class DynamoSegment extends RemoteSegment
@@ -8,7 +10,7 @@ class DynamoSegment extends RemoteSegment
     protected string $operation;
     protected string $requestId;
     /** @var string[] */
-    protected array $resourceNames;
+    protected array $resourceNames = [];
 
     public function setTableName(string $tableName): self
     {
@@ -38,18 +40,15 @@ class DynamoSegment extends RemoteSegment
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function jsonSerialize(): array
     {
         $data = parent::jsonSerialize();
 
         $data[DictionaryInterface::SEGMENT_KEY_MAIN_AWS] = \array_filter([
-            DictionaryInterface::SEGMENT_KEY_AWS_TABLE_NAME => $this->tableName ?? null,
-            DictionaryInterface::SEGMENT_KEY_AWS_OPERATION => $this->operation ?? null,
-            DictionaryInterface::SEGMENT_KEY_AWS_REQUEST_ID => $this->requestId ?? null,
-            DictionaryInterface::SEGMENT_KEY_AWS_RESOURCE_NAMES => ($this->resourceNames ?? null) ?: null,
+            DictionaryInterface::SEGMENT_KEY_AWS_TABLE_NAME => $this->tableName,
+            DictionaryInterface::SEGMENT_KEY_AWS_OPERATION => $this->operation,
+            DictionaryInterface::SEGMENT_KEY_AWS_REQUEST_ID => $this->requestId,
+            DictionaryInterface::SEGMENT_KEY_AWS_RESOURCE_NAMES => $this->resourceNames ?: null,
         ]);
 
         return $data;
