@@ -17,6 +17,11 @@ class HttpSegmentTest extends TestCase
 
         $serialised = $segment->jsonSerialize();
 
+        foreach ($serialised['http'] as $item){
+            self::assertNotNull($item);
+        }
+
+
         $this->assertEquals('remote', $serialised['namespace']);
         $this->assertEquals('http://example.com/', $serialised['http']['request']['url']);
         $this->assertEquals('GET', $serialised['http']['request']['method']);
