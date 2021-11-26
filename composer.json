@@ -1,6 +1,6 @@
 {
   "name": "fido/php-xray",
-  "description": "A basic PHP instrumentation library for AWS X-Ray",
+  "description": "PHP instrumentation library for AWS X-Ray",
   "keywords": ["AWS", "X-Ray", "AWS X-Ray", "APM", "Tracing"],
   "type": "library",
   "license": "BSD-3-Clause",
@@ -38,7 +38,8 @@
     "phpstan/phpstan-php-parser": "^0.12.0",
     "phpstan/phpstan-phpunit": "^0.12.0",
     "squizlabs/php_codesniffer": "^3.0.0",
-    "slevomat/coding-standard": "^6.0.0"
+    "slevomat/coding-standard": "^6.0.0",
+    "infection/infection": "^0.25.0"
   },
   "scripts": {
     "test": [
@@ -47,6 +48,11 @@
       "phpcs --colors -s --standard=phpcs.xml; if [ $? -ne 0 ]; then echo \"\\n\\t\\033[1;31mRun \\`./run composer run fix-cs\\` to fix.\\033[0m\n\" && exit 1; fi",
       "phpstan analyze -c phpstan.neon --no-progress src",
       "phpstan analyze -c phpstan.relaxed.neon --no-progress tests"
+    ],
+    "mutation": [
+      "composer install",
+      "phpunit",
+      "vendor/bin/infection run -j 4"
     ],
     "fix-cs": [
       "phpcbf --colors --standard=phpcs.xml; if [ $? -eq 1 ]; then exit 0; fi"

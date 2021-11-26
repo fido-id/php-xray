@@ -3,3 +3,4 @@ vendor/
 .phpunit.result.cache
 clover.xml
 coverage.xml
+report/*
