@@ -23,6 +23,7 @@ class DaemonSegmentSubmitter implements SegmentSubmitter
     /** @var Socket */
     private $socket;
 
+    /** @infection-ignore-all */
     public function __construct(string $host = '127.0.0.1', int $port = 2000)
     {
         if (isset($_SERVER[DictionaryInterface::DAEMON_ADDRESS_AND_PORT])) {

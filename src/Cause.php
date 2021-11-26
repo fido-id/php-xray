@@ -12,14 +12,55 @@ use JsonSerializable;
 class Cause implements JsonSerializable
 {
     /**
-     * @param string[]         $paths
+     * @param string[] $paths
      * @param CauseException[] $exceptions
      */
     public function __construct(
         protected string $workingDirectory,
-        protected array $paths,
-        protected array $exceptions,
-    ) {
+        protected array  $paths,
+        protected array  $exceptions,
+    )
+    {
+    }
+
+    public static function fromThrowable(\Throwable $throwable): self
+    {
+        $exceptions = [];
+        $paths = [];
+
+        $workingDirectory = $throwable->getFile() . "::" . $throwable->getLine();
+
+        do {
+            $stack = [];
+
+            foreach ($throwable->getTrace() as $trace) {
+                $stack[] = new CauseStackFrame(
+                    path: $trace['file'],
+                    line: $trace['line'],
+                    label: $trace['class'] . $trace['type'] . $trace['function'] . (\count($trace['args']) > 0 ? " with args: " . \json_encode($trace['args']) : ""),
+                );
+            }
+
+            $exceptions[] = new CauseException(
+                message: $throwable->getMessage(),
+                type: \get_class($throwable),
+                remote: false,
+                truncated: 0,
+                skipped: 0,
+                stack: $stack
+            );
+
+            $paths[] = $throwable->getFile() . "::" . $throwable->getLine();
+
+            $throwable = $throwable->getPrevious();
+
+        } while ($throwable !== null);
+
+        return new self(
+            workingDirectory: $workingDirectory,
+            paths: $paths,
+            exceptions: $exceptions
+        );
     }
 
     /**

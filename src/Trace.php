@@ -76,16 +76,12 @@ class Trace extends Segment implements HttpInterface
     /**
      * @throws Exception
      */
-    public function begin(int $samplePercentage = 10): Segment
+    public function begin(): Segment
     {
         parent::begin();
 
         if (!isset($this->traceId)) {
             $this->generateTraceId();
-        }
-
-        if (!$this->isSampled()) {
-            $this->sampled = (random_int(0, 99) < $samplePercentage);
         }
 
         return $this;
