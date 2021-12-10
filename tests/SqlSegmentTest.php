@@ -8,15 +8,17 @@ class SqlSegmentTest extends TestCase
 {
     public function testSerialisesCorrectly(): void
     {
-        $segment = new SqlSegment();
-        $segment->setQuery('SELECT *')
-            ->setDatabaseType('PostgreSQL')
-            ->setDatabaseVersion('10.4')
-            ->setDriverVersion('10')
-            ->setPreparation('prepared')
-            ->setUser('test')
-            ->setUrl('pgsql://test@localhost')
-        ;
+        $segment = new SqlSegment(
+            name: 'Test segment',
+            query: 'SELECT *',
+            url: 'pgsql://test@localhost',
+            preparation: 'prepared',
+            databaseType: 'PostgreSQL',
+            databaseVersion: '10.4',
+            driverVersion: '10',
+            user: 'test',
+        );
+        $segment->end();
 
         $serialised = $segment->jsonSerialize();
 

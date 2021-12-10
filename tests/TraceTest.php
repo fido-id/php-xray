@@ -6,27 +6,19 @@ use PHPUnit\Framework\TestCase;
 
 class TraceTest extends TestCase
 {
-    public function testGetInstanceReturnsSingleton(): void
-    {
-        $instance1 = Trace::getInstance();
-        $instance2 = Trace::getInstance();
-
-        $this->assertEquals(spl_object_hash($instance1), spl_object_hash($instance2));
-    }
-
     public function testSerialisesCorrectly(): void
     {
-        $trace = (new Trace())
-            ->setServiceVersion('1.2.3')
-            ->setUser('TestUser')
-            ->setUrl('http://example.com')
-            ->setMethod('GET')
-            ->setClientIpAddress('127.0.0.1')
-            ->setUserAgent('TestAgent')
-            ->setResponseCode(200)
-            ->setName('Test trace')
-            ->begin()
-            ->end();
+        $trace = new  Trace(
+            name: 'Test trace',
+            url: 'http://example.com',
+            method: 'GET',
+            responseCode: 200,
+            clientIpAddress: '127.0.0.1',
+            userAgent: 'TestAgent',
+            serviceVersion: '1.2.3',
+            user: 'TestUser',
+        );
+        $trace->end();
 
         $serialised = $trace->jsonSerialize();
 
@@ -43,32 +35,19 @@ class TraceTest extends TestCase
 
     public function testGeneratesCorrectFormatTraceId(): void
     {
-        $trace = new Trace();
-        $trace->begin();
+        $trace = new Trace(name: 'Test trace',);
+        $trace->end();
 
         $this->assertMatchesRegularExpression('@^1\-[a-f0-9]{8}\-[a-f0-9]{24}$@', $trace->getTraceId());
-    }
-
-    /**
-     * The logic of this test is that if you don't set a proper header the TraceId won't be set as well
-     * but the returned error is too generic imho
-     */
-    public function testGivenNullHeaderDoesNotSetId(): void
-    {
-        $this->expectException(\Error::class);
-
-        $trace = new Trace();
-        $trace->setTraceHeader();
-
-        $trace->getTraceId();
     }
 
     public function testGivenIdHeaderSetsId(): void
     {
         $traceId = '1-ab3169f3-1b7f38ac63d9037ef1843ca4';
 
-        $trace = new Trace();
+        $trace = new Trace(name: 'Test trace',);
         $trace->setTraceHeader("Root=$traceId");
+        $trace->end();
 
         $this->assertEquals($traceId, $trace->getTraceId());
         $this->assertArrayNotHasKey('parent_id', $trace->jsonSerialize());
@@ -79,8 +58,9 @@ class TraceTest extends TestCase
         $traceId  = '1-ab3169f3-1b7f38ac63d9037ef1843ca4';
         $parentId = '1234567890';
 
-        $trace = new Trace();
+        $trace = new Trace(name: 'Test trace',);
         $trace->setTraceHeader("Root=$traceId;Parent=$parentId");
+        $trace->end();
 
         $this->assertEquals($traceId, $trace->getTraceId());
         $this->assertEquals($parentId, $trace->jsonSerialize()['parent_id']);

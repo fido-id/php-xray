@@ -8,45 +8,48 @@ use Psr\Http\Message\ResponseInterface;
 
 class HttpSegment extends RemoteSegment implements HttpInterface
 {
-    protected string $url;
-    protected string $method;
-    protected int $responseCode = 0;
 
-    public function setUrl(string $url): self
-    {
-        $this->url = $url;
-
-        return $this;
-    }
-
-    public function setMethod(string $method): self
-    {
-        $this->method = $method;
-
-        return $this;
-    }
-
-    public function setResponseCode(int $responseCode): self
-    {
-        $this->responseCode = $responseCode;
-
-        return $this;
+    public function __construct(
+        string $name,
+        protected string $url,
+        protected string $method,
+        protected int $responseCode = 0,
+        bool $traced = false,
+        ?string $parentId = null,
+        ?string $traceId = null,
+        bool $error = false,
+        bool $fault = false,
+        ?Cause $cause = null,
+        bool $independent = false,
+        int $lastOpenSegment = 0
+    ) {
+        parent::__construct(
+            name: $name,
+            traced: $traced,
+            parentId: $parentId,
+            traceId: $traceId,
+            error: $error,
+            fault: $fault,
+            cause: $cause,
+            independent: $independent,
+            lastOpenSegment: $lastOpenSegment,
+        );
     }
 
     public function jsonSerialize(): array
     {
         $data = parent::jsonSerialize();
 
-        $data[DictionaryInterface::SEGMENT_KEY_MAIN_HTTP] = $this->serialiseHttpData();
+        $data[DictionaryInterface::SEGMENT_KEY_MAIN_HTTP] = $this->serializeHttpData();
 
         return $data;
     }
 
-    public function serialiseHttpData(): array
+    public function serializeHttpData(): array
     {
         return [
-            DictionaryInterface::SEGMENT_KEY_HTTP_REQUEST => [
-                DictionaryInterface::SEGMENT_KEY_HTTP_REQUEST_URL => $this->url,
+            DictionaryInterface::SEGMENT_KEY_HTTP_REQUEST  => [
+                DictionaryInterface::SEGMENT_KEY_HTTP_REQUEST_URL    => $this->url,
                 DictionaryInterface::SEGMENT_KEY_HTTP_REQUEST_METHOD => $this->method,
             ],
             DictionaryInterface::SEGMENT_KEY_HTTP_RESPONSE => [
@@ -55,21 +58,9 @@ class HttpSegment extends RemoteSegment implements HttpInterface
         ];
     }
 
-    public static function open(string $name, string $url, string $method): self
+    public function closeWithPsrResponse(ResponseInterface $response): void
     {
-        $self = new self();
-
-        $self->setName($name);
-        $self->setUrl($url);
-        $self->setMethod($method);
-        $self->begin();
-
-        return $self;
-    }
-
-    public function closeWithPsrResponse(ResponseInterface $response): self
-    {
-        $this->setResponseCode($response->getStatusCode());
+        $this->responseCode = $response->getStatusCode();
 
         if ($response->getStatusCode() >= 500 && $response->getStatusCode() < 600) {
             $this->setFault(true);
@@ -84,7 +75,5 @@ class HttpSegment extends RemoteSegment implements HttpInterface
         $this->addMetadata("headers", $response->getHeaders());
 
         $this->end();
-
-        return $this;
     }
 }

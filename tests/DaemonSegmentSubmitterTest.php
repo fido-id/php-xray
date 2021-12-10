@@ -2,8 +2,8 @@
 
 namespace Fido\PHPXray;
 
-use PHPUnit\Framework\TestCase;
 use Fido\PHPXray\Submission\DaemonSegmentSubmitter;
+use PHPUnit\Framework\TestCase;
 use Socket;
 
 class DaemonSegmentSubmitterTest extends TestCase
@@ -24,40 +24,46 @@ class DaemonSegmentSubmitterTest extends TestCase
         parent::tearDown();
     }
 
-    public function testSubmitsToDaemon(): void
+    public function testGetConfigFromGlobal(): void
     {
-        $segment = new Segment();
-        $segment
-            ->setName('Test segment')
-            ->begin()
-            ->end()
-            ->submit(new DaemonSegmentSubmitter())
-        ;
+        $_SERVER[DictionaryInterface::DAEMON_ADDRESS_AND_PORT] = '127.0.0.1:2000';
+
+        $segment = new Segment(
+            name: 'Test segment'
+        );
+        $segment->end();
+        (new DaemonSegmentSubmitter())->submitSegment($segment);
 
         $packets = $this->receivePackets(1);
+        $this->assertPacketsReceived([$segment], $packets);
+    }
 
+    public function testSubmitsToDaemon(): void
+    {
+        $segment = new Segment(
+            name: 'Test segment'
+        );
+        $segment->end();
+        (new DaemonSegmentSubmitter())->submitSegment($segment);
+
+        $packets = $this->receivePackets(1);
         $this->assertPacketsReceived([$segment], $packets);
     }
 
     public function testSubmitsLongTraceAsFragmented(): void
     {
-        $subsegment1 = (new SqlSegment())
-            ->setQuery(str_repeat('a', 30000));
-        $subsegment2 = (new SqlSegment())
-            ->setQuery(str_repeat('b', 30000));
-        $subsegment3 = (new SqlSegment())
-            ->setQuery(str_repeat('c', 30000));
+        $subsegment1 = new SqlSegment('Query a', str_repeat('a', 30000));
+        $subsegment2 = new SqlSegment('Query b', str_repeat('b', 30000));
+        $subsegment3 = new SqlSegment('Query c', str_repeat('c', 30000));
 
-        $segment = new Trace();
-        $segment
-            ->setName('Test segment')
-            ->begin()
-            ->addSubsegment($subsegment1)
-            ->addSubsegment($subsegment2)
-            ->addSubsegment($subsegment3)
-            ->end()
-            ->submit(new DaemonSegmentSubmitter())
-        ;
+        $segment = new Trace(
+            name: 'Test segment',
+        );
+        $segment->addSubsegment($subsegment1);
+        $segment->addSubsegment($subsegment2);
+        $segment->addSubsegment($subsegment3);
+        $segment->end();
+        (new DaemonSegmentSubmitter())->submitSegment($segment);
 
         $buffer = $this->receivePackets(5);
 
@@ -67,20 +73,17 @@ class DaemonSegmentSubmitterTest extends TestCase
         unset($openingSegment['end_time']);
         $openingSegment['in_progress'] = true;
 
-        $subsegment1->setIndependent(true)
-            ->setTraceId($segment->getTraceId())
-            ->setParentId($segment->getId())
-        ;
+        $subsegment1->setIndependent(true);
+        $subsegment1->setTraceId($segment->getTraceId());
+        $subsegment1->setParentId($segment->getId());
 
-        $subsegment2->setIndependent(true)
-            ->setTraceId($segment->getTraceId())
-            ->setParentId($segment->getId())
-        ;
+        $subsegment2->setIndependent(true);
+        $subsegment2->setTraceId($segment->getTraceId());
+        $subsegment2->setParentId($segment->getId());
 
-        $subsegment3->setIndependent(true)
-            ->setTraceId($segment->getTraceId())
-            ->setParentId($segment->getId())
-        ;
+        $subsegment3->setIndependent(true);
+        $subsegment3->setTraceId($segment->getTraceId());
+        $subsegment3->setParentId($segment->getId());
 
         $expectedPackets = [$openingSegment, $subsegment1, $subsegment2, $subsegment3, $rawSegment];
 

@@ -6,31 +6,35 @@ namespace Fido\PHPXray;
 
 class DynamoSegment extends RemoteSegment
 {
-    protected string $tableName;
-    protected string $operation;
-    protected string $requestId;
     /** @var string[] */
     protected array $resourceNames = [];
 
-    public function setTableName(string $tableName): self
+    public function __construct(
+        string $name,
+        protected string $tableName,
+        protected string $operation,
+        protected string $requestId,
+        bool $traced = false,
+        ?string $parentId = null,
+        ?string $traceId = null,
+        bool $error = false,
+        bool $fault = false,
+        ?Cause $cause = null,
+        bool $independent = false,
+        int $lastOpenSegment = 0
+    )
     {
-        $this->tableName = $tableName;
-
-        return $this;
-    }
-
-    public function setOperation(string $operation): self
-    {
-        $this->operation = $operation;
-
-        return $this;
-    }
-
-    public function setRequestId(string $requestId): self
-    {
-        $this->requestId = $requestId;
-
-        return $this;
+        parent::__construct(
+            name: $name,
+            traced: $traced,
+            parentId: $parentId,
+            traceId: $traceId,
+            error: $error,
+            fault: $fault,
+            cause: $cause,
+            independent: $independent,
+            lastOpenSegment: $lastOpenSegment,
+        );
     }
 
     public function addResourceName(string $value): self
@@ -48,7 +52,7 @@ class DynamoSegment extends RemoteSegment
             DictionaryInterface::SEGMENT_KEY_AWS_TABLE_NAME => $this->tableName,
             DictionaryInterface::SEGMENT_KEY_AWS_OPERATION => $this->operation,
             DictionaryInterface::SEGMENT_KEY_AWS_REQUEST_ID => $this->requestId,
-            DictionaryInterface::SEGMENT_KEY_AWS_RESOURCE_NAMES => $this->resourceNames ?: null,
+            DictionaryInterface::SEGMENT_KEY_AWS_RESOURCE_NAMES => $this->resourceNames,
         ]);
 
         return $data;
