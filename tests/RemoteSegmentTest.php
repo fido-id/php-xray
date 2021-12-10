@@ -8,7 +8,8 @@ class RemoteSegmentTest extends TestCase
 {
     public function testUntracedSegmentSerialisesCorrectly(): void
     {
-        $segment = new RemoteSegment();
+        $segment = new RemoteSegment('Remote segment');
+        $segment->end();
 
         $serialised = $segment->jsonSerialize();
 
@@ -19,8 +20,11 @@ class RemoteSegmentTest extends TestCase
 
     public function testTracedSegmentSerialisesCorrectly(): void
     {
-        $segment = new RemoteSegment();
-        $segment->setTraced(true);
+        $segment = new RemoteSegment(
+            name: 'Remote segment',
+            traced: true
+        );
+        $segment->end();
 
         $serialised = $segment->jsonSerialize();
 

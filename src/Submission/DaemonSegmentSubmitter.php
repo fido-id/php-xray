@@ -3,9 +3,10 @@
 namespace Fido\PHPXray\Submission;
 
 use Error;
-use Fido\PHPXray\Segment;
 use Fido\PHPXray\DictionaryInterface;
+use Fido\PHPXray\Segment;
 use Socket;
+use Webmozart\Assert\Assert;
 
 use function socket_create;
 use function socket_last_error;
@@ -18,13 +19,17 @@ class DaemonSegmentSubmitter implements SegmentSubmitter
      * @var array<string, mixed>
      */
     public const HEADER = ['format' => 'json', 'version' => 1];
-    private string $host;
-    private int $port;
     /** @var Socket */
     private $socket;
 
     /** @infection-ignore-all */
-    public function __construct(string $host = '127.0.0.1', int $port = 2000)
+    public function __construct(
+        private string $host = '127.0.0.1',
+        private int $port = 2000,
+        int $socketDomain = AF_INET,
+        int $socketType = SOCK_DGRAM,
+        int $socketProtocol = SOL_UDP
+    )
     {
         if (isset($_SERVER[DictionaryInterface::DAEMON_ADDRESS_AND_PORT])) {
             [$host, $port] = explode(":", $_SERVER[DictionaryInterface::DAEMON_ADDRESS_AND_PORT]);
@@ -33,9 +38,8 @@ class DaemonSegmentSubmitter implements SegmentSubmitter
         $this->host = $_SERVER[DictionaryInterface::DAEMON_ADDRESS] ?? $host;
         $this->port = (int)($_SERVER[DictionaryInterface::DAEMON_PORT] ?? $port);
 
-        if (!$socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP)) {
-            throw new Error('Can\'t create socket: ' . socket_last_error());
-        }
+        $socket = socket_create($socketDomain, $socketType, $socketProtocol);
+        Assert::notFalse($socket);
         $this->socket = $socket;
     }
 
@@ -73,6 +77,8 @@ class DaemonSegmentSubmitter implements SegmentSubmitter
     private function submitFragmented(Segment $segment): void
     {
         $rawSegment = $segment->jsonSerialize();
+        $traceId = $segment->getTraceId();
+        Assert::string($traceId, "Trace ID is mandatory when subsegment are sent independently.");
         /** @var Segment[] $subsegments */
         $subsegments = $rawSegment[DictionaryInterface::SEGMENT_KEY_MAIN_SUBSEGMENTS] ?? [];
         unset($rawSegment[DictionaryInterface::SEGMENT_KEY_MAIN_SUBSEGMENTS]);
@@ -80,11 +86,9 @@ class DaemonSegmentSubmitter implements SegmentSubmitter
 
         foreach ($subsegments as $subsegment) {
             $subsegment = clone $subsegment;
-            $subsegment
-                ->setParentId($segment->getId())
-                ->setTraceId($segment->getTraceId())
-                ->setIndependent(true)
-            ;
+            $subsegment->setParentId($segment->getId());
+            $subsegment->setTraceId($traceId);
+            $subsegment->setIndependent(true);
             $this->submitSegment($subsegment);
         }
 

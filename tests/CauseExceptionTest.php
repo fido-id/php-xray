@@ -16,7 +16,8 @@ class CauseExceptionTest extends TestCase
             type: 'test',
             remote: true,
             truncated: 0,
-            skipped: 0
+            skipped: 0,
+            cause: 'test'
         );
 
         $this->assertSame('test', $causeException->getMessage());
@@ -24,6 +25,7 @@ class CauseExceptionTest extends TestCase
         $this->assertTrue($causeException->isRemote());
         $this->assertSame(0, $causeException->getTruncated());
         $this->assertSame(0, $causeException->getSkipped());
+        $this->assertSame('test', $causeException->getCause());
     }
 
     public function testJsonSerialize(): void

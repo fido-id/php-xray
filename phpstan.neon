@@ -2,8 +2,3 @@ parameters:
     level: max
     paths:
         - src
-    ignoreErrors:
-      -
-        message: '#.*#'
-        paths:
-           - src/examples/*
