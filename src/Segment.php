@@ -4,6 +4,7 @@ namespace Fido\PHPXray;
 
 use Fido\PHPXray\Submission\SegmentSubmitter;
 use JsonSerializable;
+use Webmozart\Assert\Assert;
 
 class Segment implements JsonSerializable
 {
@@ -19,7 +20,6 @@ class Segment implements JsonSerializable
     protected bool   $fault       = false;
     //todo handle cause object OR exception ID
     protected ?Cause $cause       = null;
-    protected bool   $sampled     = false;
     protected bool   $independent = false;
     /** @var array<string, mixed> */
     private array $annotations;
@@ -52,9 +52,7 @@ class Segment implements JsonSerializable
         if (isset($variables['Root'])) {
             $this->setTraceId($variables['Root']);
         }
-        if (isset($variables['Sampled'])) {
-            $this->setSampled((bool)$variables['Sampled'] ?? false);
-        }
+
         if (isset($variables['Parent'])) {
             $this->setParentId($variables['Parent'] ?? null);
         }
@@ -99,35 +97,18 @@ class Segment implements JsonSerializable
 
     public function addSubsegment(Segment $subsegment): self
     {
-        if (!$this->isOpen()) {
-            return $this;
-        }
+        Assert::true($this->isOpen(), 'Cant add a subsegment to a closed segment!');
+
+        $subsegment->setParentId($this->id);
 
         $this->subsegments[] = $subsegment;
-        $subsegment->setSampled($this->isSampled());
 
         return $this;
     }
 
     public function submit(SegmentSubmitter $submitter): void
     {
-        if (!$this->isSampled()) {
-            return;
-        }
-
         $submitter->submitSegment($this);
-    }
-
-    public function isSampled(): bool
-    {
-        return $this->sampled;
-    }
-
-    public function setSampled(bool $sampled): self
-    {
-        $this->sampled = $sampled;
-
-        return $this;
     }
 
     public function getId(): string

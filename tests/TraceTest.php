@@ -71,19 +71,6 @@ class TraceTest extends TestCase
         $trace->setTraceHeader("Root=$traceId");
 
         $this->assertEquals($traceId, $trace->getTraceId());
-        $this->assertFalse($trace->isSampled());
-        $this->assertArrayNotHasKey('parent_id', $trace->jsonSerialize());
-    }
-
-    public function testGivenSampledHeaderSetsSampled(): void
-    {
-        $traceId = '1-ab3169f3-1b7f38ac63d9037ef1843ca4';
-
-        $trace = new Trace();
-        $trace->setTraceHeader("Root=$traceId;Sampled=1");
-
-        $this->assertEquals($traceId, $trace->getTraceId());
-        $this->assertTrue($trace->isSampled());
         $this->assertArrayNotHasKey('parent_id', $trace->jsonSerialize());
     }
 
@@ -93,10 +80,9 @@ class TraceTest extends TestCase
         $parentId = '1234567890';
 
         $trace = new Trace();
-        $trace->setTraceHeader("Root=$traceId;Sampled=1;Parent=$parentId");
+        $trace->setTraceHeader("Root=$traceId;Parent=$parentId");
 
         $this->assertEquals($traceId, $trace->getTraceId());
-        $this->assertTrue($trace->isSampled());
         $this->assertEquals($parentId, $trace->jsonSerialize()['parent_id']);
     }
 }

@@ -27,7 +27,7 @@ class DaemonSegmentSubmitterTest extends TestCase
     public function testSubmitsToDaemon(): void
     {
         $segment = new Segment();
-        $segment->setSampled(true)
+        $segment
             ->setName('Test segment')
             ->begin()
             ->end()
@@ -49,7 +49,7 @@ class DaemonSegmentSubmitterTest extends TestCase
             ->setQuery(str_repeat('c', 30000));
 
         $segment = new Trace();
-        $segment->setSampled(true)
+        $segment
             ->setName('Test segment')
             ->begin()
             ->addSubsegment($subsegment1)

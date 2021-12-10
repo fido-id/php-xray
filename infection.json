@@ -1,0 +1,25 @@
+{
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "timeout": 5,
+    "logs": {
+        "github": false,
+        "text": "report/infection.md",
+        "perMutator": "report/per-mutator.md",
+        "badge": {
+            "branch": "/^release-.*$/"
+        }
+    },
+    "tmpDir": "/tmp/tmp-folder",
+    "phpUnit": {
+        "configDir": ".",
+        "customPath": "vendor/bin/phpunit"
+    },
+    "mutators": {
+        "@default": true
+    },
+    "testFramework":"phpunit"
+}

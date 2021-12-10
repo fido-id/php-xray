@@ -9,6 +9,7 @@ fi
 
 docker run ${tty} \
   --rm \
+  --net host \
   --user "user:$(id -g)" \
   --volume "${PWD}:${PWD}" \
   --workdir "${PWD}" \
