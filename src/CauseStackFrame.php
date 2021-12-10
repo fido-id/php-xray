@@ -34,28 +34,13 @@ class CauseStackFrame implements \JsonSerializable
         return $this->path;
     }
 
-    public function setPath(string $path): void
-    {
-        $this->path = $path;
-    }
-
     public function getLine(): int
     {
         return $this->line;
     }
 
-    public function setLine(int $line): void
-    {
-        $this->line = $line;
-    }
-
     public function getLabel(): string
     {
         return $this->label;
-    }
-
-    public function setLabel(string $label): void
-    {
-        $this->label = $label;
     }
 }

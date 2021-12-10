@@ -6,6 +6,26 @@ use PHPUnit\Framework\TestCase;
 
 class CauseExceptionTest extends TestCase
 {
+    /**
+     * @test
+     */
+    public function smokeTest(): void
+    {
+        $causeException = new CauseException(
+            message: 'test',
+            type: 'test',
+            remote: true,
+            truncated: 0,
+            skipped: 0
+        );
+
+        $this->assertSame('test', $causeException->getMessage());
+        $this->assertSame('test', $causeException->getType());
+        $this->assertTrue($causeException->isRemote());
+        $this->assertSame(0, $causeException->getTruncated());
+        $this->assertSame(0, $causeException->getSkipped());
+    }
+
     public function testJsonSerialize(): void
     {
         $randomBytes    = \bin2hex(\random_bytes(8));
