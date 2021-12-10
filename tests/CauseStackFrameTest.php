@@ -6,6 +6,22 @@ use PHPUnit\Framework\TestCase;
 
 class CauseStackFrameTest extends TestCase
 {
+    /**
+     * @test
+     */
+    public function smokeTest(): void
+    {
+        $causeStackFrame = new CauseStackFrame(
+            path: 'test',
+            line: 0,
+            label: 'test'
+        );
+
+        $this->assertSame('test', $causeStackFrame->getPath());
+        $this->assertSame(0, $causeStackFrame->getLine());
+        $this->assertSame('test', $causeStackFrame->getLabel());
+    }
+
     public function testJsonSerialize(): void
     {
         $causeStackFrame = new CauseStackFrame(__CLASS__, 0, __METHOD__);

@@ -80,11 +80,6 @@ class Cause implements JsonSerializable
         return $this->workingDirectory;
     }
 
-    public function setWorkingDirectory(string $workingDirectory): void
-    {
-        $this->workingDirectory = $workingDirectory;
-    }
-
     /**
      * @return string[]
      */
@@ -93,13 +88,6 @@ class Cause implements JsonSerializable
         return $this->paths;
     }
 
-    /**
-     * @param string[] $paths
-     */
-    public function setPaths(array $paths): void
-    {
-        $this->paths = $paths;
-    }
 
     /**
      * @return CauseException[]
@@ -107,13 +95,5 @@ class Cause implements JsonSerializable
     public function getExceptions(): array
     {
         return $this->exceptions;
-    }
-
-    /**
-     * @param CauseException[] $exceptions
-     */
-    public function setExceptions(array $exceptions): void
-    {
-        $this->exceptions = $exceptions;
     }
 }

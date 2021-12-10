@@ -60,19 +60,9 @@ class CauseException implements \JsonSerializable
         return $this->message;
     }
 
-    public function setMessage(string $message): void
-    {
-        $this->message = $message;
-    }
-
     public function getType(): string
     {
         return $this->type;
-    }
-
-    public function setType(string $type): void
-    {
-        $this->type = $type;
     }
 
     public function isRemote(): bool
@@ -80,19 +70,9 @@ class CauseException implements \JsonSerializable
         return $this->remote;
     }
 
-    public function setRemote(bool $remote): void
-    {
-        $this->remote = $remote;
-    }
-
     public function getTruncated(): int
     {
         return $this->truncated;
-    }
-
-    public function setTruncated(int $truncated): void
-    {
-        $this->truncated = $truncated;
     }
 
     public function getSkipped(): int
@@ -100,19 +80,9 @@ class CauseException implements \JsonSerializable
         return $this->skipped;
     }
 
-    public function setSkipped(int $skipped): void
-    {
-        $this->skipped = $skipped;
-    }
-
     public function getCause(): ?string
     {
         return $this->cause;
-    }
-
-    public function setCause(?string $cause): void
-    {
-        $this->cause = $cause;
     }
 
     /**
@@ -121,13 +91,5 @@ class CauseException implements \JsonSerializable
     public function getStack(): ?array
     {
         return $this->stack;
-    }
-
-    /**
-     * @param CauseStackFrame[] $stack
-     */
-    public function setStack(?array $stack): void
-    {
-        $this->stack = $stack;
     }
 }
