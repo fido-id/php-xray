@@ -61,7 +61,7 @@ class HttpSegment extends RemoteSegment implements HttpInterface
     {
         $this->responseCode = $response->getStatusCode();
 
-        if ($response->getStatusCode() >= 500 && $response->getStatusCode() < 600) {
+        if ($response->getStatusCode() >= 500) {
             $this->setFault(true);
         }
 

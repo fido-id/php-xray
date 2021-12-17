@@ -31,27 +31,50 @@ class CauseExceptionTest extends TestCase
     public function testJsonSerialize(): void
     {
         $randomBytes    = \bin2hex(\random_bytes(8));
-        $causeException = new CauseException('message', 'type', true, 0, 0, $randomBytes, []);
-        $result         = \json_decode(\json_encode($causeException), true);
+        $causeException = new CauseException(
+            message: 'message',
+            type: 'type',
+            remote: true,
+            truncated: 0,
+            skipped: 0,
+            cause: $randomBytes,
+            stack: []
+        );
+        $result         = $causeException->jsonSerialize();
 
         $this->assertSame(16, strlen($result['id']));
         $this->assertTrue(ctype_xdigit($result['id']));
-        $this->assertSame('message', $result['message']);
-        $this->assertSame('type', $result['type']);
-        $this->assertTrue($result['remote']);
-        $this->assertSame(0, $result['truncated']);
-        $this->assertSame(0, $result['skipped']);
-        $this->assertSame($randomBytes, $result['cause']);
-        $this->assertSame([], $result['stack']);
         $this->assertSame([
-            'id',
-            'message',
-            'type',
-            'remote',
-            'truncated',
-            'skipped',
-            'cause',
-            'stack',
-        ], array_keys($result));
+            'id'        => $causeException->getId(),
+            'message'   => 'message',
+            'type'      => 'type',
+            'remote'    => true,
+            'truncated' => 0,
+            'skipped'   => 0,
+            'cause'     => $randomBytes,
+            'stack'     => [],
+        ], $result);
+
+        $causeException = new CauseException(
+            message: 'message',
+            type: 'type',
+            remote: true,
+            truncated: 0,
+            skipped: 0
+        );
+        $result         = $causeException->jsonSerialize();
+
+        $this->assertSame(16, strlen($result['id']));
+        $this->assertTrue(ctype_xdigit($result['id']));
+        $this->assertSame([
+            'id'        => $causeException->getId(),
+            'message'   => 'message',
+            'type'      => 'type',
+            'remote'    => true,
+            'truncated' => 0,
+            'skipped'   => 0,
+            'cause' => null,
+            'stack' => null,
+        ], $result);
     }
 }

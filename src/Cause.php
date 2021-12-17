@@ -12,21 +12,20 @@ use JsonSerializable;
 class Cause implements JsonSerializable
 {
     /**
-     * @param string[] $paths
+     * @param string[]         $paths
      * @param CauseException[] $exceptions
      */
     public function __construct(
         protected string $workingDirectory,
-        protected array  $paths,
-        protected array  $exceptions,
-    )
-    {
+        protected array $paths,
+        protected array $exceptions,
+    ) {
     }
 
-    public static function fromThrowable(\Throwable $throwable): self
+    public static function fromThrowable(\Throwable $throwable, bool $isRemote = false): self
     {
         $exceptions = [];
-        $paths = [];
+        $paths      = [];
 
         $workingDirectory = $throwable->getFile() . "::" . $throwable->getLine();
 
@@ -44,7 +43,7 @@ class Cause implements JsonSerializable
             $exceptions[] = new CauseException(
                 message: $throwable->getMessage(),
                 type: \get_class($throwable),
-                remote: false,
+                remote: $isRemote,
                 truncated: 0,
                 skipped: 0,
                 stack: $stack
@@ -53,7 +52,6 @@ class Cause implements JsonSerializable
             $paths[] = $throwable->getFile() . "::" . $throwable->getLine();
 
             $throwable = $throwable->getPrevious();
-
         } while ($throwable !== null);
 
         return new self(
@@ -87,7 +85,6 @@ class Cause implements JsonSerializable
     {
         return $this->paths;
     }
-
 
     /**
      * @return CauseException[]

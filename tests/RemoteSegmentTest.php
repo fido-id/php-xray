@@ -6,9 +6,11 @@ use PHPUnit\Framework\TestCase;
 
 class RemoteSegmentTest extends TestCase
 {
+    use TestSubsegmentTrait;
+
     public function testUntracedSegmentSerialisesCorrectly(): void
     {
-        $segment = new RemoteSegment('Remote segment');
+        $segment = $this->getNewSegment();
         $segment->end();
 
         $serialised = $segment->jsonSerialize();
@@ -31,5 +33,12 @@ class RemoteSegmentTest extends TestCase
         $this->assertEquals($segment->getId(), $serialised['id']);
         $this->assertEquals('remote', $serialised['namespace']);
         $this->assertTrue($serialised['traced']);
+    }
+
+    private function getNewSegment(string $name = 'Remote segment'): RemoteSegment
+    {
+        return new RemoteSegment(
+            name: $name,
+        );
     }
 }
