@@ -8,7 +8,6 @@ use Psr\Http\Message\ResponseInterface;
 
 class HttpSegment extends RemoteSegment implements HttpInterface
 {
-
     public function __construct(
         string $name,
         protected string $url,

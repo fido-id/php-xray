@@ -1,9 +1,11 @@
 FROM php:8.0-cli
 
-COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
-
 RUN apt-get update && \
-    apt-get install git unzip -y
+    apt-get install git unzip curl -y
+
+RUN curl https://getcomposer.org/download/2.1.14/composer.phar -o /usr/local/bin/composer
+RUN php -r "if (hash_file('sha256', '/usr/local/bin/composer') === 'd44a904520f9aaa766e8b4b05d2d9a766ad9a6f03fa1a48518224aad703061a4') { exit(0); } else { exit(1); }"
+RUN chmod +x /usr/local/bin/composer
 
 RUN docker-php-ext-install sockets \
     && pecl install xdebug \
