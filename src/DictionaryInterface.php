@@ -4,7 +4,6 @@ namespace Fido\PHPXray;
 
 interface DictionaryInterface
 {
-
     // MAIN [TYPE_AREA_VALUE]
 
     /**  aws for AWS SDK calls; remote for other downstream calls. */

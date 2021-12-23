@@ -4,7 +4,6 @@ namespace Fido\PHPXray;
 
 class SqlSegment extends RemoteSegment
 {
-
     public function __construct(
         string $name,
         protected string $query,
