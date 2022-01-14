@@ -2,64 +2,168 @@
 
 namespace Fido\PHPXray;
 
-use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\TestCase;
 
 class HttpSegmentTest extends TestCase
 {
+    use TestSubsegmentTrait;
+
     public function testSerialisesCorrectly(): void
     {
         $segment = new HttpSegment(
             name: 'HTTP Segment',
-            url: 'http://example.com/',
-            method: 'GET',
-            responseCode: 200
+            url: 'url',
+            method: 'method',
+            responseCode: 200,
+            traced: true,
+            parentId: 'parent_id',
+            traceId: 'trace_id',
+            error: false,
+            fault: false,
+            cause: new Cause('working_dir', [], []),
+            independent: true,
+            lastOpenSegment: 1,
         );
         $segment->end();
 
-        $serialised = $segment->jsonSerialize();
+        $serialized = \json_decode(\json_encode($segment), true);
+        $this->assertIsNumeric($serialized['end_time']);
+        unset($serialized['end_time']);
 
-        foreach ($serialised['http'] as $item){
-            self::assertNotNull($item);
-        }
+        $this->assertSame([
+            'id'         => $segment->getId(),
+            'parent_id'  => 'parent_id',
+            'trace_id'   => 'trace_id',
+            'name'       => 'HTTP Segment',
+            'start_time' => $segment->getStartTime(),
+            'type'       => 'subsegment',
+            'cause'      => [
+                'working_directory' => 'working_dir',
+                'paths'             => [],
+                'exceptions'        => [],
+            ],
+            'namespace'  => 'remote',
+            'traced'     => true,
+            'http'       => [
+                'request'  => [
+                    'url'    => 'url',
+                    'method' => 'method',
+                ],
+                'response' => [
+                    'status' => 200,
+                ],
+            ],
+        ], $serialized);
 
-        $this->assertEquals('remote', $serialised['namespace']);
-        $this->assertEquals('http://example.com/', $serialised['http']['request']['url']);
-        $this->assertEquals('GET', $serialised['http']['request']['method']);
-        $this->assertEquals(200, $serialised['http']['response']['status']);
+        $segment = $this->getNewSegment();
+        $segment->end();
+
+        $serialized = \json_decode(\json_encode($segment), true);
+        $this->assertIsNumeric($serialized['end_time']);
+        unset($serialized['end_time']);
+        $this->assertSame([
+            'id'         => $segment->getId(),
+            'name'       => 'HTTP Segment',
+            'start_time' => $segment->getStartTime(),
+            'namespace'  => 'remote',
+            'http'       => [
+                'request'  => [
+                    'url'    => 'http://example.com/',
+                    'method' => 'GET',
+                ],
+                'response' => [
+                    'status' => 0,
+                ],
+            ],
+        ], $serialized);
     }
 
     public function testCloseWithPsrResponse400(): void
     {
-        $segment = new HttpSegment(
-            name: 'HTTP Segment',
-            url: 'http://example.com/',
-            method: 'GET',
-        );
+        $segment = $this->getNewSegment();
         $segment->closeWithPsrResponse(new Response(400));
-        $serialised = $segment->jsonSerialize();
 
-        $this->assertEquals(400, $serialised['http']['response']['status']);
-        $this->assertTrue($serialised['error']);
-        $this->assertSame("", $serialised['metadata']['content']);
-        $this->assertSame("Bad Request", $serialised['metadata']['reason']);
-        $this->assertCount(0, $serialised['metadata']['headers']);
+        $serialized = \json_decode(\json_encode($segment), true);
+        $this->assertIsNumeric($serialized['end_time']);
+        unset($serialized['end_time']);
+
+        $this->assertSame([
+            'id'         => $segment->getId(),
+            'name'       => 'HTTP Segment',
+            'start_time' => $segment->getStartTime(),
+            'error'      => true,
+            'metadata'   => [
+                'content' => '',
+                'reason'  => 'Bad Request',
+                'headers' => [],
+            ],
+            'namespace'  => 'remote',
+            'http'       => [
+                'request'  => [
+                    'url'    => 'http://example.com/',
+                    'method' => 'GET',
+                ],
+                'response' => [
+                    'status' => 400,
+                ],
+            ],
+        ], $serialized);
     }
 
     public function testCloseWithPsrResponse500(): void
     {
-        $segment = new HttpSegment(
-            name: 'HTTP Segment',
+        $segment = $this->getNewSegment();
+        $segment->closeWithPsrResponse(new Response(500));
+
+        $serialized = \json_decode(\json_encode($segment), true);
+        $this->assertIsNumeric($serialized['end_time']);
+        unset($serialized['end_time']);
+
+        $this->assertSame([
+            'id'         => $segment->getId(),
+            'name'       => 'HTTP Segment',
+            'start_time' => $segment->getStartTime(),
+            'fault'      => true,
+            'metadata'   => [
+                'content' => '',
+                'reason'  => 'Internal Server Error',
+                'headers' => [],
+            ],
+            'namespace'  => 'remote',
+            'http'       => [
+                'request'  => [
+                    'url'    => 'http://example.com/',
+                    'method' => 'GET',
+                ],
+                'response' => [
+                    'status' => 500,
+                ],
+            ],
+        ], $serialized);
+    }
+
+    public function testCloseWithPsrResponse(): void
+    {
+        $segment = $this->getNewSegment();
+        $segment->closeWithPsrResponse(new Response(200));
+        $serialized = \json_decode(\json_encode($segment), true);
+        $this->assertArrayNotHasKey('error', $serialized);
+        $this->assertArrayNotHasKey('fault', $serialized);
+
+        $segment = $this->getNewSegment();
+        $segment->closeWithPsrResponse(new Response(100));
+        $serialized = \json_decode(\json_encode($segment), true);
+        $this->assertArrayNotHasKey('error', $serialized);
+        $this->assertArrayNotHasKey('fault', $serialized);
+    }
+
+    private function getNewSegment(string $name = 'HTTP Segment'): HttpSegment
+    {
+        return new HttpSegment(
+            name: $name,
             url: 'http://example.com/',
             method: 'GET',
         );
-        $segment->closeWithPsrResponse(new Response(500));
-        $serialised = $segment->jsonSerialize();
-
-        $this->assertEquals(500, $serialised['http']['response']['status']);
-        $this->assertTrue($serialised['fault']);
-        $this->assertSame("", $serialised['metadata']['content']);
-        $this->assertSame("Internal Server Error", $serialised['metadata']['reason']);
-        $this->assertCount(0, $serialised['metadata']['headers']);
     }
 }

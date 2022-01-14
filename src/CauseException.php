@@ -45,8 +45,8 @@ class CauseException implements \JsonSerializable
             DictionaryInterface::SEGMENT_KEY_CAUSE_EXCEPTION_REMOTE    => $this->remote,
             DictionaryInterface::SEGMENT_KEY_CAUSE_EXCEPTION_TRUNCATED => $this->truncated,
             DictionaryInterface::SEGMENT_KEY_CAUSE_EXCEPTION_SKIPPED   => $this->skipped,
-            DictionaryInterface::SEGMENT_KEY_CAUSE_EXCEPTION_CAUSE     => $this->cause ?? null,
-            DictionaryInterface::SEGMENT_KEY_CAUSE_EXCEPTION_STACK     => $this->stack ?? null,
+            DictionaryInterface::SEGMENT_KEY_CAUSE_EXCEPTION_CAUSE     => $this->cause,
+            DictionaryInterface::SEGMENT_KEY_CAUSE_EXCEPTION_STACK     => $this->stack,
         ];
     }
 

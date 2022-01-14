@@ -56,7 +56,7 @@ class Segment implements JsonSerializable
         }
 
         if (isset($variables['Parent'])) {
-            $this->setParentId($variables['Parent'] ?? null);
+            $this->setParentId($variables['Parent']);
         }
     }
 
