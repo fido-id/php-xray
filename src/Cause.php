@@ -36,7 +36,7 @@ class Cause implements JsonSerializable
                 $stack[] = new CauseStackFrame(
                     path: $trace['file'],
                     line: $trace['line'],
-                    label: $trace['class'] . $trace['type'] . $trace['function'] . (\count($trace['args']) > 0 ? " with args: " . \json_encode($trace['args']) : ""),
+                    label: $trace['class'] . $trace['type'] . $trace['function'] . (\count($trace['args'] ?? []) > 0 ? " with args: " . \json_encode($trace['args']) : ""),
                 );
             }
 
