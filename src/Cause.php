@@ -12,20 +12,21 @@ use JsonSerializable;
 class Cause implements JsonSerializable
 {
     /**
-     * @param string[]         $paths
+     * @param string[] $paths
      * @param CauseException[] $exceptions
      */
     public function __construct(
         protected string $workingDirectory,
-        protected array $paths,
-        protected array $exceptions,
-    ) {
+        protected array  $paths,
+        protected array  $exceptions,
+    )
+    {
     }
 
     public static function fromThrowable(\Throwable $throwable, bool $isRemote = false): self
     {
         $exceptions = [];
-        $paths      = [];
+        $paths = [];
 
         $workingDirectory = $throwable->getFile() . "::" . $throwable->getLine();
 
@@ -33,11 +34,16 @@ class Cause implements JsonSerializable
             $stack = [];
 
             foreach ($throwable->getTrace() as $trace) {
-                $stack[] = new CauseStackFrame(
-                    path: $trace['file'],
-                    line: $trace['line'],
-                    label: $trace['class'] . $trace['type'] . $trace['function'] . (\count($trace['args'] ?? []) > 0 ? " with args: " . \json_encode($trace['args']) : ""),
-                );
+
+                $line = $trace['line'] ?? 'no_line';
+                $file = $trace['file'] ?? 'no_file';
+                $class = $trace['class'] ?? 'no_class';
+                $type = $trace['type'] ?? 'no_type';
+                $function = $trace['function'] ?? 'no_function';
+                $args = $trace['args'] ?? [];
+                $encodedArgs = \count($args) > 0 ? " with args: " . \json_encode($args) : "";
+
+                $stack[] = new CauseStackFrame(path: $file, line: $line, label: $class . $type . $function . $encodedArgs);
             }
 
             $exceptions[] = new CauseException(
@@ -68,8 +74,8 @@ class Cause implements JsonSerializable
     {
         return [
             DictionaryInterface::SEGMENT_KEY_CAUSE_WORKING_DIRECTORY => $this->workingDirectory,
-            DictionaryInterface::SEGMENT_KEY_CAUSE_PATHS             => $this->paths,
-            DictionaryInterface::SEGMENT_KEY_CAUSE_EXCEPTIONS        => $this->exceptions,
+            DictionaryInterface::SEGMENT_KEY_CAUSE_PATHS => $this->paths,
+            DictionaryInterface::SEGMENT_KEY_CAUSE_EXCEPTIONS => $this->exceptions,
         ];
     }
 

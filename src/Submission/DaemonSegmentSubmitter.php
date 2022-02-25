@@ -2,23 +2,20 @@
 
 namespace Fido\PHPXray\Submission;
 
-use Error;
 use Fido\PHPXray\DictionaryInterface;
 use Fido\PHPXray\Segment;
 use Socket;
 use Webmozart\Assert\Assert;
 
 use function socket_create;
-use function socket_last_error;
 
 class DaemonSegmentSubmitter implements SegmentSubmitter
 {
     protected const MAX_SEGMENT_SIZE = 64000;
 
-    /**
-     * @var array<string, mixed>
-     */
+    /** @var array<string, mixed> */
     public const HEADER = ['format' => 'json', 'version' => 1];
+
     /** @var Socket */
     private $socket;
 
@@ -40,6 +37,7 @@ class DaemonSegmentSubmitter implements SegmentSubmitter
 
         $socket = socket_create($socketDomain, $socketType, $socketProtocol);
         Assert::notFalse($socket);
+
         $this->socket = $socket;
     }
 
