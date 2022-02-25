@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 echo "Build image..."
 image_name="php-xray"
