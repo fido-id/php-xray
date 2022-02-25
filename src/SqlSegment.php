@@ -36,7 +36,7 @@ class SqlSegment extends RemoteSegment
     }
 
     /**
-     * @inheritdoc
+     * @return array<string,mixed>
      */
     public function jsonSerialize(): array
     {

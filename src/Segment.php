@@ -158,8 +158,7 @@ class Segment implements JsonSerializable
     }
 
     /**
-     * @inheritDoc
-     * @return array<string, string|bool|float|null|array|Cause>
+     * @return array<string,mixed>
      */
     public function jsonSerialize(): array
     {
