@@ -39,7 +39,7 @@ class Trace extends Segment implements HttpInterface
     }
 
     /**
-     * @inheritdoc
+     * @return array<string,mixed>
      */
     public function jsonSerialize(): array
     {

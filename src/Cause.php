@@ -35,11 +35,11 @@ class Cause implements JsonSerializable
 
             foreach ($throwable->getTrace() as $trace) {
 
-                $line = $trace['line'] ?? 'no_line';
+                $line = $trace['line'] ?? 0;
                 $file = $trace['file'] ?? 'no_file';
                 $class = $trace['class'] ?? 'no_class';
                 $type = $trace['type'] ?? 'no_type';
-                $function = $trace['function'] ?? 'no_function';
+                $function = $trace['function'];
                 $args = $trace['args'] ?? [];
                 $encodedArgs = \count($args) > 0 ? " with args: " . \json_encode($args) : "";
 
