@@ -74,6 +74,43 @@ class DynamoSegmentTest extends TestCase
         ], $serialised);
     }
 
+    public function testSerialisesCorrectly_with_requestid_null(): void
+    {
+        $segment = $this->getNewSegmentRequestIdNull();
+        $segment->addResourceName('value');
+        $segment->end();
+
+        $serialised = $segment->jsonSerialize();
+        unset($serialised['end_time']);
+        $this->assertSame([
+            'id'         => $segment->getId(),
+            'name'       => 'Dynamo segment',
+            'start_time' => $segment->getStartTime(),
+            'namespace'  => 'remote',
+            'aws'        => [
+                'table_name'     => 'example-table',
+                'operation'      => 'UpdateItem',
+                'resource_names' => ['value',],
+            ],
+        ], $serialised);
+
+        $segment->setRequestId('3AIENM5J4ELQ3SPODHKBIRVIC3VV4KQNSO5AEMVJF66Q9ASUAAJG');
+        $serialised = $segment->jsonSerialize();
+        unset($serialised['end_time']);
+        $this->assertSame([
+            'id'         => $segment->getId(),
+            'name'       => 'Dynamo segment',
+            'start_time' => $segment->getStartTime(),
+            'namespace'  => 'remote',
+            'aws'        => [
+                'table_name'     => 'example-table',
+                'operation'      => 'UpdateItem',
+                'request_id'     => '3AIENM5J4ELQ3SPODHKBIRVIC3VV4KQNSO5AEMVJF66Q9ASUAAJG',
+                'resource_names' => ['value',],
+            ],
+        ], $serialised);
+    }
+
     private function getNewSegment(string $name = 'Dynamo segment'): DynamoSegment
     {
         return new DynamoSegment(
@@ -81,6 +118,15 @@ class DynamoSegmentTest extends TestCase
             tableName: 'example-table',
             operation: 'UpdateItem',
             requestId: '3AIENM5J4ELQ3SPODHKBIRVIC3VV4KQNSO5AEMVJF66Q9ASUAAJG',
+        );
+    }
+
+    private function getNewSegmentRequestIdNull(string $name = 'Dynamo segment'): DynamoSegment
+    {
+        return new DynamoSegment(
+            name: $name,
+            tableName: 'example-table',
+            operation: 'UpdateItem',
         );
     }
 }

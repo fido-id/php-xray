@@ -13,7 +13,7 @@ class DynamoSegment extends RemoteSegment
         string $name,
         protected string $tableName,
         protected string $operation,
-        protected string $requestId,
+        protected ?string $requestId = null,
         bool $traced = false,
         ?string $parentId = null,
         ?string $traceId = null,
@@ -35,6 +35,11 @@ class DynamoSegment extends RemoteSegment
             independent: $independent,
             lastOpenSegment: $lastOpenSegment,
         );
+    }
+
+    public function setRequestId(?string $requestId): void
+    {
+        $this->requestId = $requestId;
     }
 
     public function addResourceName(string $value): self
