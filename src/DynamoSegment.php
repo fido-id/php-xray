@@ -37,11 +37,6 @@ class DynamoSegment extends RemoteSegment
         );
     }
 
-    public function getRequestId(): ?string
-    {
-        return $this->requestId;
-    }
-
     public function setRequestId(?string $requestId): void
     {
         $this->requestId = $requestId;

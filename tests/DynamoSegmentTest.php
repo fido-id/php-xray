@@ -81,8 +81,6 @@ class DynamoSegmentTest extends TestCase
         $segment->end();
 
         $serialised = $segment->jsonSerialize();
-
-        $this->assertIsNumeric($serialised['end_time']);
         unset($serialised['end_time']);
         $this->assertSame([
             'id'         => $segment->getId(),
@@ -92,6 +90,22 @@ class DynamoSegmentTest extends TestCase
             'aws'        => [
                 'table_name'     => 'example-table',
                 'operation'      => 'UpdateItem',
+                'resource_names' => ['value',],
+            ],
+        ], $serialised);
+
+        $segment->setRequestId('3AIENM5J4ELQ3SPODHKBIRVIC3VV4KQNSO5AEMVJF66Q9ASUAAJG');
+        $serialised = $segment->jsonSerialize();
+        unset($serialised['end_time']);
+        $this->assertSame([
+            'id'         => $segment->getId(),
+            'name'       => 'Dynamo segment',
+            'start_time' => $segment->getStartTime(),
+            'namespace'  => 'remote',
+            'aws'        => [
+                'table_name'     => 'example-table',
+                'operation'      => 'UpdateItem',
+                'request_id'     => '3AIENM5J4ELQ3SPODHKBIRVIC3VV4KQNSO5AEMVJF66Q9ASUAAJG',
                 'resource_names' => ['value',],
             ],
         ], $serialised);
