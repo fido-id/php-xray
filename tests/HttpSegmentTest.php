@@ -3,6 +3,7 @@
 namespace Fido\PHPXray;
 
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Utils;
 use PHPUnit\Framework\TestCase;
 
 class HttpSegmentTest extends TestCase
@@ -156,6 +157,16 @@ class HttpSegmentTest extends TestCase
         $serialized = \json_decode(\json_encode($segment), true);
         $this->assertArrayNotHasKey('error', $serialized);
         $this->assertArrayNotHasKey('fault', $serialized);
+    }
+
+    public function testRewindResponse(): void
+    {
+        $segment = $this->getNewSegment();
+        $stream = Utils::streamFor('string data');
+        $response = new Response(200, [], $stream);
+        $segment->closeWithPsrResponse($response);
+
+        $this->assertSame('string data', $response->getBody()->getContents());
     }
 
     private function getNewSegment(string $name = 'HTTP Segment'): HttpSegment
