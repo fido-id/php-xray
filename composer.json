@@ -22,7 +22,8 @@
   "require": {
     "php": ">=8.0.0",
     "ext-json": "*",
-    "ext-sockets": "*"
+    "ext-sockets": "*",
+    "webmozart/assert": "^1.11"
   },
   "autoload": {
     "psr-4": {"Fido\\PHPXray\\": "src/"}

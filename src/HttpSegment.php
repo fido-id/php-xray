@@ -73,6 +73,8 @@ class HttpSegment extends RemoteSegment implements HttpInterface
         $this->addMetadata("reason", $response->getReasonPhrase());
         $this->addMetadata("headers", $response->getHeaders());
 
+        $response->getBody()->rewind();
+        
         $this->end();
     }
 }
