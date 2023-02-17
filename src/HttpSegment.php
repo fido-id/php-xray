@@ -9,19 +9,20 @@ use Psr\Http\Message\ResponseInterface;
 class HttpSegment extends RemoteSegment implements HttpInterface
 {
     public function __construct(
-        string $name,
+        string           $name,
         protected string $url,
         protected string $method,
-        protected int $responseCode = 0,
-        bool $traced = false,
-        ?string $parentId = null,
-        ?string $traceId = null,
-        bool $error = false,
-        bool $fault = false,
-        ?Cause $cause = null,
-        bool $independent = false,
-        int $lastOpenSegment = 0
-    ) {
+        protected int    $responseCode = 0,
+        bool             $traced = false,
+        ?string          $parentId = null,
+        ?string          $traceId = null,
+        bool             $error = false,
+        bool             $fault = false,
+        ?Cause           $cause = null,
+        bool             $independent = false,
+        int              $lastOpenSegment = 0
+    )
+    {
         parent::__construct(
             name: $name,
             traced: $traced,
@@ -47,8 +48,8 @@ class HttpSegment extends RemoteSegment implements HttpInterface
     public function serializeHttpData(): array
     {
         return [
-            DictionaryInterface::SEGMENT_KEY_HTTP_REQUEST  => [
-                DictionaryInterface::SEGMENT_KEY_HTTP_REQUEST_URL    => $this->url,
+            DictionaryInterface::SEGMENT_KEY_HTTP_REQUEST => [
+                DictionaryInterface::SEGMENT_KEY_HTTP_REQUEST_URL => $this->url,
                 DictionaryInterface::SEGMENT_KEY_HTTP_REQUEST_METHOD => $this->method,
             ],
             DictionaryInterface::SEGMENT_KEY_HTTP_RESPONSE => [
@@ -57,7 +58,7 @@ class HttpSegment extends RemoteSegment implements HttpInterface
         ];
     }
 
-    public function closeWithPsrResponse(ResponseInterface $response): void
+    public function closeWithPsrResponse(ResponseInterface $response, bool $withContent = true, bool $withReason = true, bool $withHeaders = true): void
     {
         $this->responseCode = $response->getStatusCode();
 
@@ -69,12 +70,19 @@ class HttpSegment extends RemoteSegment implements HttpInterface
             $this->setError(true);
         }
 
-        $this->addMetadata("content", $response->getBody()->getContents());
-        $this->addMetadata("reason", $response->getReasonPhrase());
-        $this->addMetadata("headers", $response->getHeaders());
+        if ($withContent) {
+            $this->addMetadata("content", $response->getBody()->getContents());
+            $response->getBody()->rewind();
+        }
 
-        $response->getBody()->rewind();
-        
+        if ($withReason) {
+            $this->addMetadata("reason", $response->getReasonPhrase());
+        }
+
+        if ($withHeaders) {
+            $this->addMetadata("headers", $response->getHeaders());
+        }
+
         $this->end();
     }
 }

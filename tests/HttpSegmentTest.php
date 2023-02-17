@@ -33,22 +33,22 @@ class HttpSegmentTest extends TestCase
         unset($serialized['end_time']);
 
         $this->assertSame([
-            'id'         => $segment->getId(),
-            'parent_id'  => 'parent_id',
-            'trace_id'   => 'trace_id',
-            'name'       => 'HTTP Segment',
+            'id' => $segment->getId(),
+            'parent_id' => 'parent_id',
+            'trace_id' => 'trace_id',
+            'name' => 'HTTP Segment',
             'start_time' => $segment->getStartTime(),
-            'type'       => 'subsegment',
-            'cause'      => [
+            'type' => 'subsegment',
+            'cause' => [
                 'working_directory' => 'working_dir',
-                'paths'             => [],
-                'exceptions'        => [],
+                'paths' => [],
+                'exceptions' => [],
             ],
-            'namespace'  => 'remote',
-            'traced'     => true,
-            'http'       => [
-                'request'  => [
-                    'url'    => 'url',
+            'namespace' => 'remote',
+            'traced' => true,
+            'http' => [
+                'request' => [
+                    'url' => 'url',
                     'method' => 'method',
                 ],
                 'response' => [
@@ -64,13 +64,13 @@ class HttpSegmentTest extends TestCase
         $this->assertIsNumeric($serialized['end_time']);
         unset($serialized['end_time']);
         $this->assertSame([
-            'id'         => $segment->getId(),
-            'name'       => 'HTTP Segment',
+            'id' => $segment->getId(),
+            'name' => 'HTTP Segment',
             'start_time' => $segment->getStartTime(),
-            'namespace'  => 'remote',
-            'http'       => [
-                'request'  => [
-                    'url'    => 'http://example.com/',
+            'namespace' => 'remote',
+            'http' => [
+                'request' => [
+                    'url' => 'http://example.com/',
                     'method' => 'GET',
                 ],
                 'response' => [
@@ -90,19 +90,19 @@ class HttpSegmentTest extends TestCase
         unset($serialized['end_time']);
 
         $this->assertSame([
-            'id'         => $segment->getId(),
-            'name'       => 'HTTP Segment',
+            'id' => $segment->getId(),
+            'name' => 'HTTP Segment',
             'start_time' => $segment->getStartTime(),
-            'error'      => true,
-            'metadata'   => [
+            'error' => true,
+            'metadata' => [
                 'content' => '',
-                'reason'  => 'Bad Request',
+                'reason' => 'Bad Request',
                 'headers' => [],
             ],
-            'namespace'  => 'remote',
-            'http'       => [
-                'request'  => [
-                    'url'    => 'http://example.com/',
+            'namespace' => 'remote',
+            'http' => [
+                'request' => [
+                    'url' => 'http://example.com/',
                     'method' => 'GET',
                 ],
                 'response' => [
@@ -122,19 +122,19 @@ class HttpSegmentTest extends TestCase
         unset($serialized['end_time']);
 
         $this->assertSame([
-            'id'         => $segment->getId(),
-            'name'       => 'HTTP Segment',
+            'id' => $segment->getId(),
+            'name' => 'HTTP Segment',
             'start_time' => $segment->getStartTime(),
-            'fault'      => true,
-            'metadata'   => [
+            'fault' => true,
+            'metadata' => [
                 'content' => '',
-                'reason'  => 'Internal Server Error',
+                'reason' => 'Internal Server Error',
                 'headers' => [],
             ],
-            'namespace'  => 'remote',
-            'http'       => [
-                'request'  => [
-                    'url'    => 'http://example.com/',
+            'namespace' => 'remote',
+            'http' => [
+                'request' => [
+                    'url' => 'http://example.com/',
                     'method' => 'GET',
                 ],
                 'response' => [
@@ -157,6 +157,21 @@ class HttpSegmentTest extends TestCase
         $serialized = \json_decode(\json_encode($segment), true);
         $this->assertArrayNotHasKey('error', $serialized);
         $this->assertArrayNotHasKey('fault', $serialized);
+    }
+
+    public function testCloseWithPsrResponseAndNoContent(): void
+    {
+        $segment = $this->getNewSegment();
+        $segment->closeWithPsrResponse(new Response(200), withContent: false, withReason: false, withHeaders: false);
+        $serialized = \json_decode(\json_encode($segment), true);
+        $this->assertArrayNotHasKey('metadata', $serialized);
+
+        $segment->closeWithPsrResponse(new Response(200));
+        $serialized = \json_decode(\json_encode($segment), true);
+
+        $this->assertArrayHasKey('content', $serialized["metadata"]);
+        $this->assertArrayHasKey('headers', $serialized["metadata"]);
+        $this->assertArrayHasKey('reason', $serialized["metadata"]);
     }
 
     public function testRewindResponse(): void
