@@ -20,7 +20,7 @@ To use this package, use [Composer](https://getcomposer.org/):
 ```json
 {
   "require": {
-    "fido/php-xray": "^0.1.0",
+    "fido/php-xray": "^0.2.1",
   }
 }
 ```
