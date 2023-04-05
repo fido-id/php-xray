@@ -41,7 +41,11 @@ class Cause implements JsonSerializable
                 $type = $trace['type'] ?? 'no_type';
                 $function = $trace['function'];
                 $args = $trace['args'] ?? [];
-                $encodedArgs = \count($args) > 0 ? " with args: " . \json_encode($args) : "";
+                try {
+                    $encodedArgs = \count($args) > 0 ? ' with args: ' . \json_encode($args) : '';
+                } catch (\Throwable $t) {
+                    $encodedArgs = " with args: [unable to encode] {$t->getFile()} {$t->getLine()}";
+                }
 
                 $stack[] = new CauseStackFrame(path: $file, line: $line, label: $class . $type . $function . $encodedArgs);
             }
